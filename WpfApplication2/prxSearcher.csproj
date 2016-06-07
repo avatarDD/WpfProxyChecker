@@ -56,8 +56,8 @@
     </ApplicationDefinition>
     <Compile Include="Html_parser.cs" />
     <Compile Include="ProxySearcher.cs" />
-    <Compile Include="Proxy\ProxiesList.cs" />
-    <Compile Include="Proxy\Proxy.cs" />
+    <Compile Include="ProxiesList.cs" />
+    <Compile Include="Proxy.cs" />
     <Compile Include="Searcher.cs" />
     <Page Include="DataGridStyle.xaml">
       <SubType>Designer</SubType>

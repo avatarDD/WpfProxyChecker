@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System;
 using System.Media;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace prxSearcher
 {
@@ -24,8 +25,12 @@ namespace prxSearcher
         }
 
         private void MenuAbout_Click(object sender, RoutedEventArgs e)
-        {            
-            MessageBox.Show("ver1.0");
+        {
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            string version = fvi.FileVersion;
+
+            MessageBox.Show(String.Format("ver: {0}", version));
         }
 
         private void menuExit_Click(object sender, RoutedEventArgs e)
@@ -35,7 +40,7 @@ namespace prxSearcher
 
         private void mainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.Escape)
+            if (e.Key == Key.Escape && pl != null)
             {
                 if(pl.mIsRun)
                 {
