@@ -156,8 +156,12 @@ namespace prxSearcher
             }
             mIsRun = true;
             OnChanged(this,EventArgs.Empty);
-        }           
-               
+        }
+        /// <summary>
+        /// Update list of active searching threads
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void UpdateProxyLoadThreadsList(object sender, KilledEnentArgs e)
         {
             if (!mIsRun)
@@ -182,7 +186,7 @@ namespace prxSearcher
             mThreadsCount = mProxyLoadThreads.Length;
             OnChanged(this, EventArgs.Empty);
         }
-
+        
         /// <summary>
         /// delete proxy from dictionary
         /// </summary>

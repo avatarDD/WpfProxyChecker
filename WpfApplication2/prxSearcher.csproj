@@ -60,6 +60,7 @@
     <Compile Include="ProxiesList.cs" />
     <Compile Include="Proxy.cs" />
     <Compile Include="Searcher.cs" />
+    <Compile Include="Settings.cs" />
     <Page Include="DataGridStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

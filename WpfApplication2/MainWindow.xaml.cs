@@ -41,27 +41,34 @@ namespace prxSearcher
 
         private void mainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Escape && pl != null)
+            if (e.Key == Key.Escape)
             {
-                if(pl.mIsRun)
+                if (pl == null)
+                {
+                     if (MessageBox.Show("Do you want exit?", "exit", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
+                    {
+                        Close();
+                    }
+                }
+                else if(pl.mIsRun)
                 {
                     //Task.Run(() => { pl.StopProxiesLoading(); });
                     pl.StopProxiesLoading();
                 }
-                else if(MessageBox.Show("Do you want exit?","exit",MessageBoxButton.YesNo,MessageBoxImage.Question,MessageBoxResult.No)==MessageBoxResult.Yes)
+                else if (MessageBox.Show("Do you want exit?", "exit", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
                 {
-                    this.Close();
-                }
+                    Close();
+                }              
             }
             else if(e.Key == Key.F1)
             {
                 MenuAbout_Click(this,null);
             }
-        }
+        }        
 
         private void menuFindPrxs_Click(object sender, RoutedEventArgs e)
         {
-            pl = new ProxiesList(5, 500);
+            pl = new ProxiesList(20, 500);
             dtUnsrtd.ItemsSource = pl;
             pbStatus.Visibility = Visibility.Visible;
             pl.Changed += new EventHandler(UpdateDataGrid);            

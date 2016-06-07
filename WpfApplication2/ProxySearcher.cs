@@ -134,7 +134,7 @@ namespace prxSearcher
                 string html = "";
                 if (Get(html_parser.ClearUrl(s), "", out html))
                 {
-                    string[] proxies = html_parser.Matches(html, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}.\d{2,5}");
+                    string[] proxies = html_parser.Matches(html, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{2,5}");
                     if (proxies.Length > 0)
                     {
                         foreach (string p in proxies)
