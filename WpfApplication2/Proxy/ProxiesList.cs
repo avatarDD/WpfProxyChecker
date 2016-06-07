@@ -48,8 +48,8 @@ namespace prxSearcher
         public int mProgressValue;
         public string mStatus;
 
-        public delegate void ChangedEventHandler(object sender, EventArgs e);
-        public event ChangedEventHandler Changed;
+        //public delegate void ChangedEventHandler(object sender, EventArgs e);
+        public event EventHandler Changed;
 
         //-----------------------------methods---------------------------------
         public void Dispose()
@@ -58,7 +58,11 @@ namespace prxSearcher
             
             for (int i = 0; i < mSearchers.Count; i++)
             {
-                mProxyLoadThreads[i].StopLoading();
+                try
+                {
+                    mProxyLoadThreads[i].StopLoading();
+                }
+                catch (Exception) { }
             }
         }
         /// <summary>

@@ -55,11 +55,11 @@ namespace prxSearcher
 
         private void menuFindPrxs_Click(object sender, RoutedEventArgs e)
         {
-            pl = new ProxiesList(6, 70);
+            pl = new ProxiesList(5, 70);
             dtUnsrtd.ItemsSource = pl;
             pbStatus.Visibility = Visibility.Visible;
-            pl.Changed += new ProxiesList.ChangedEventHandler(UpdateDataGrid);
-            pl.GetProxiesList("proxy list txt");
+            pl.Changed += new EventHandler(UpdateDataGrid);
+            pl.GetProxiesList("proxy list");
         }
 
         private void mainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

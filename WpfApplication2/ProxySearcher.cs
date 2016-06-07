@@ -105,7 +105,7 @@ namespace prxSearcher
                     request.Proxy = new WebProxy(Proxy);
                 }
                 //---------
-                request.Proxy = new WebProxy("127.0.0.1:3128");
+                //request.Proxy = new WebProxy("127.0.0.1:3128");
                 //---------
                 request.Timeout = 8000;
 
