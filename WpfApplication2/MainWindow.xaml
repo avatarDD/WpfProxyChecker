@@ -1,0 +1,61 @@
+﻿<Window x:Name="mainWindow" x:Class="prxSearcher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:prxSearcher"
+        mc:Ignorable="d"
+        Title="Proxy Searcher" Height="480" Width="640" Background="#FFDABFBF" WindowStartupLocation="CenterScreen" KeyDown="mainWindow_KeyDown" Closing="mainWindow_Closing">
+    <Grid Margin="0,0,0,0" Background="#FFD3C6C6">
+        <Menu x:Name="menu" Height="27" VerticalAlignment="Top" Margin="0,0,0,0" BorderThickness="1" Background="#FFF3E9E9" BorderBrush="{DynamicResource LightBorderBrush}" Foreground="{DynamicResource DefaultedBorderBrush}">
+            <MenuItem Header="File">
+                <MenuItem x:Name="menuFindPrxs" Header="Find proxies" Click="menuFindPrxs_Click"/>
+                <MenuItem x:Name="menuTestPrxs" Header="Test proxies"/>
+                <Separator/>
+                <MenuItem x:Name="menuExit" Header="Exit" Click="menuExit_Click"/>
+            </MenuItem>
+            <MenuItem Header="?">
+                <MenuItem x:Name="menuAbout" Header="About" Click="MenuAbout_Click"/>
+            </MenuItem>
+        </Menu>
+        <Grid RenderTransformOrigin="2.14,2.08" Margin="0,27,0,34">
+            <TabControl x:Name="tabControl" Margin="5">
+                <TabItem Header="Proxies">
+                    <Grid Background="#FFF3E9E9">
+                        <DataGrid x:Name="dtUnsrtd" d:LayoutOverrides="Width" Margin="2" IsReadOnly="True" Foreground="Black" Style="{DynamicResource DataGridStyle}" HorizontalGridLinesBrush="Gray">
+                            <DataGrid.Columns>
+                                <!--<DataGridTextColumn x:Name="adress" Header="IP adress : port"  Binding="{Binding adress}"/>
+                                <DataGridTextColumn x:Name="type" Header="Type" Binding="{Binding type}"/>
+                                <DataGridTextColumn x:Name="country" Header="Country" Binding="{Binding country}"/>
+                                <DataGridTextColumn x:Name="latency" Header="Latency" Binding="{Binding latency}"/>-->
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </Grid>
+
+        <Border BorderBrush="Gray" BorderThickness="1" Height="19" Margin="5,0,0,10" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="195">
+            <TextBlock x:Name="tbStatus" TextWrapping="Wrap" FontSize="12" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding mStatus}"/>
+        </Border>
+        <Border BorderBrush="Gray" BorderThickness="1" Height="19" Margin="200,0,5,10" VerticalAlignment="Bottom" RenderTransformOrigin="0.501,0.789">
+            <ProgressBar x:Name="pbStatus" Foreground="#FF164920" Value="{Binding mProgressValue}">
+                <ProgressBar.BorderBrush>
+                    <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                        <GradientStop Color="#FFB2B2B2" Offset="0"/>
+                        <GradientStop Color="#FFF1E8E8" Offset="1"/>
+                    </LinearGradientBrush>
+                </ProgressBar.BorderBrush>
+                <ProgressBar.Background>
+                    <LinearGradientBrush EndPoint="1,0" StartPoint="0,0">
+                        <GradientStop Color="#FFBABABA" Offset="0"/>
+                        <GradientStop Color="#FFC7C7C7" Offset="0.5"/>
+                        <GradientStop Color="#FFCBBABA" Offset="1"/>
+                    </LinearGradientBrush>
+                </ProgressBar.Background>
+            </ProgressBar>
+
+        </Border>
+    </Grid>
+
+</Window>

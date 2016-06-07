@@ -1,0 +1,9 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:prxSearcher.Properties">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/prxSearcher;component/DataGridStyle.xaml"/>
+        <ResourceDictionary Source="/prxSearcher;component/Simple Styles.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>
