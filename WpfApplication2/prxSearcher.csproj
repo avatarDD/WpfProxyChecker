@@ -55,6 +55,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Html_parser.cs" />
+    <Compile Include="KilledEnentArgs.cs" />
     <Compile Include="ProxySearcher.cs" />
     <Compile Include="ProxiesList.cs" />
     <Compile Include="Proxy.cs" />

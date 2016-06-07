@@ -10,6 +10,7 @@ namespace prxSearcher
     class ProxySearcher
     {
         private Thread mT;
+        public int mId;
         private bool mIsRun { get; set; }
         private int mIdOfSearcher;
         private string mSearchPhrase;
@@ -17,7 +18,9 @@ namespace prxSearcher
         List<Searcher> mSearchersList;
         private Dictionary<string, Proxy> mPrxsDic;
         private int mPrxsCountNeed;
-
+        public delegate void mKilledEventHandler(object sender, KilledEnentArgs e);
+        public event mKilledEventHandler mKilled;
+        public event EventHandler mPrxsLstUpdated;
 
         //methods
         public ProxySearcher(int NameOfThread, int IdOfSearcher, string SearchPhrase, int StartFromPage, ref List<Searcher> SearchersList, ref Dictionary<string, Proxy> PrxsDic, int PrxsCountNeed)
@@ -31,10 +34,12 @@ namespace prxSearcher
             
             mT = new Thread(new ThreadStart(ProxyToAssemble));
             mT.Name = NameOfThread.ToString();
+            mId = NameOfThread;
             mIsRun = true;
-            mT.Start();
+            mT.IsBackground = true;
+            mT.Start();                      
         }
-
+                
         public bool IsRun()
         {
             return mIsRun;
@@ -55,28 +60,22 @@ namespace prxSearcher
             txtQuery.Append("&");
             txtQuery.Append(mSearchersList[mIdOfSearcher].pageVar);
             txtQuery.Append("=");
-            
-            try
+
+            while (mPrxsDic.Count < mPrxsCountNeed && mIsRun)
             {
-                while (mPrxsDic.Count < mPrxsCountNeed && mIsRun)
+                string html = "";
+                string uri = txtQuery.ToString() + mPage.ToString();
+                if (Get(uri, string.Empty, out html))
                 {
-                    string html = "";
-                    string uri = txtQuery.ToString() + mPage.ToString();
-                    if (Get(uri, string.Empty, out html))
-                    {
-                        if (html.ToLower().Contains("captcha"))
-                            StopLoading();
-                        ParseProxies(html_parser.Matches(html, mSearchersList[mIdOfSearcher].regexExpOfResults));
-                    }
-                    mPage += mSearchersList[mIdOfSearcher].step;
-                    Thread.Sleep(200);
+                    if (html.ToLower().Contains("captcha"))
+                        StopLoading();
+                    ParseProxies(html_parser.Matches(html, mSearchersList[mIdOfSearcher].regexExpOfResults));
                 }
+                mPage += mSearchersList[mIdOfSearcher].step;
+                Thread.Sleep(200);
             }
-            catch(Exception ex) { }
-            finally
-            { 
-                mIsRun = false;
-            }
+
+            mIsRun = false;
         }
 
         /// <summary>
@@ -129,34 +128,28 @@ namespace prxSearcher
         private void ParseProxies(string[] Urls)
         {
             foreach (string s in Urls)
-            {                
-                if (mPrxsDic.Count < mPrxsCountNeed && mIsRun)
+            {
+                if (mPrxsDic.Count > mPrxsCountNeed || !mIsRun)
+                    return;
+                string html = "";
+                if (Get(html_parser.ClearUrl(s), "", out html))
                 {
-                    string html = "";
-                    if (Get(html_parser.ClearUrl(s), "", out html))
+                    string[] proxies = html_parser.Matches(html, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}.\d{2,5}");
+                    if (proxies.Length > 0)
                     {
-                        string[] proxies = html_parser.Matches(html, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}.\d{2,5}");
-                        if (proxies.Length > 0)
+                        foreach (string p in proxies)
                         {
-                            foreach (string p in proxies)
+                            if (p != "")
                             {
-                                if (p != "")
+                                if (!mPrxsDic.ContainsKey(p))
                                 {
-                                    if (!mPrxsDic.ContainsKey(p))
-                                    {
-                                        Proxy newProxy = new Proxy();
-                                        newProxy.adress = p;
-                                        Add(newProxy);
-                                    }
+                                    Proxy newProxy = new Proxy();
+                                    newProxy.adress = p;
+                                    Add(newProxy);
                                 }
                             }
                         }
                     }
-                }
-                else
-                {
-                    mIsRun = false;
-                    return;
                 }
             }
         }
@@ -169,6 +162,7 @@ namespace prxSearcher
                 if (!mPrxsDic.ContainsKey(p.adress))
                 {
                     mPrxsDic.Add(p.adress, p);
+                    mPrxsLstUpdated(this, EventArgs.Empty);
                 }
 
                 mIsRun = (mPrxsDic.Count >= mPrxsCountNeed) ? false : true;
@@ -177,8 +171,11 @@ namespace prxSearcher
 
         public void StopLoading()
         {
-            mIsRun = false;
-            mT.Abort();                        
+            int i = int.Parse(mT.Name);        
+            mIsRun = false;            
+            //mT.Join();
+            if(mT.ThreadState == ThreadState.Stopped)
+                mKilled(this, new KilledEnentArgs(i));
         }
     }
 }

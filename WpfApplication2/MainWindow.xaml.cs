@@ -7,6 +7,7 @@ using System;
 using System.Media;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Threading;
 
 namespace prxSearcher
 {
@@ -44,8 +45,8 @@ namespace prxSearcher
             {
                 if(pl.mIsRun)
                 {
-                    Task.Run(() => { pl.StopProxiesLoading(); });
-                    //pl.StopProxiesLoading();
+                    //Task.Run(() => { pl.StopProxiesLoading(); });
+                    pl.StopProxiesLoading();
                 }
                 else if(MessageBox.Show("Do you want exit?","exit",MessageBoxButton.YesNo,MessageBoxImage.Question,MessageBoxResult.No)==MessageBoxResult.Yes)
                 {
@@ -60,10 +61,10 @@ namespace prxSearcher
 
         private void menuFindPrxs_Click(object sender, RoutedEventArgs e)
         {
-            pl = new ProxiesList(5, 70);
+            pl = new ProxiesList(5, 500);
             dtUnsrtd.ItemsSource = pl;
             pbStatus.Visibility = Visibility.Visible;
-            pl.Changed += new EventHandler(UpdateDataGrid);
+            pl.Changed += new EventHandler(UpdateDataGrid);            
             pl.GetProxiesList("proxy list");
         }
 
@@ -75,21 +76,25 @@ namespace prxSearcher
 
         private void UpdateDataGrid(object sender, EventArgs e)
         {
-            Dispatcher.Invoke(() =>
-            {                
-                CollectionViewSource.GetDefaultView(dtUnsrtd.ItemsSource).Refresh();
-                pbStatus.Value = pl.mProgressValue;
-                if (pbStatus.Value == 0 && !pl.mIsRun)
+            try
+            {
+                Dispatcher.Invoke(() =>
                 {
-                    pbStatus.Visibility = Visibility.Collapsed;
-                    string pathToWav = String.Format(@"{0}\Media\Windows Notify.wav", Environment.GetEnvironmentVariable("SystemRoot"));
-                    using (var soundPlayer = new SoundPlayer(pathToWav))
+                    CollectionViewSource.GetDefaultView(dtUnsrtd.ItemsSource).Refresh();
+                    pbStatus.Value = pl.mProgressValue;
+                    if (pbStatus.Value == 0 && !pl.mIsRun)
                     {
-                        soundPlayer.Play(); // can also use soundPlayer.PlaySync()
+                        pbStatus.Visibility = Visibility.Collapsed;
+                        string pathToWav = String.Format(@"{0}\Media\Windows Notify.wav", Environment.GetEnvironmentVariable("SystemRoot"));
+                        using (var soundPlayer = new SoundPlayer(pathToWav))
+                        {
+                            soundPlayer.Play(); // can also use soundPlayer.PlaySync()
+                        }
                     }
-                }
-                tbStatus.Text = pl.mStatus;
-            });
+                    tbStatus.Text = pl.mStatus;
+                });
+            }
+            catch (Exception) { }
         }
     }
 }
