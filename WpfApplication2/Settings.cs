@@ -47,6 +47,7 @@ namespace prxSearcher
                     mThreadsCount = newSettings.mThreadsCount;
                     mUseProxy = newSettings.mUseProxy;
                     mProxy = newSettings.mProxy;
+                    mSearchPhrase = newSettings.mSearchPhrase;
                     mPathToFileSettings = newSettings.mPathToFileSettings;
                     mPathToFileResult = newSettings.mPathToFileResult;
                     mSearchers = newSettings.mSearchers;
@@ -54,7 +55,9 @@ namespace prxSearcher
             }
             catch (Exception ex)
             {
-                throw new Exception(String.Format("Can't read settings from file.\r\n{0}", ex.Message));
+                //RestoreSettingsToDefaults();
+                //SaveSettingsToFile();
+                throw new Exception(String.Format("Can't read settings from file.\r\n{0}\r\n{1}", ex.Message,ex.StackTrace));
             }
         }
 
