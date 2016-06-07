@@ -17,12 +17,15 @@ namespace prxSearcher
     public partial class MainWindow : Window
     {
         ProxiesList pl;
+        Settings mySettings;
 
         public MainWindow()
         {
             InitializeComponent();
             tbStatus.Text = "Idle";
             pbStatus.Visibility = Visibility.Collapsed;
+            mySettings = new Settings();
+            mySettings.LoadSettings();
         }
 
         private void MenuAbout_Click(object sender, RoutedEventArgs e)
@@ -61,7 +64,7 @@ namespace prxSearcher
                 }              
             }
             else if(e.Key == Key.F1)
-            {
+            {            
                 MenuAbout_Click(this,null);
             }
         }        
