@@ -13,6 +13,8 @@ namespace prxSearcher
         /// searchers
         /// </summary>
         private List<Searcher> mSearchers;
+        
+        private Dictionary<Searcher,Dictionary<int,bool>> mCurrentSearchPageOfSearcher;
         /// <summary>
         /// how many proxies needed
         /// </summary>
@@ -33,13 +35,19 @@ namespace prxSearcher
         /// The dictionary that contain proxies list
         /// </summary>
         public Dictionary<string, Proxy> mPrxsDic;
+        private string mProxy;
+        private string mSearchPhrase;
         /// <summary>
         /// For display on DataGrid
         /// </summary>
         public Proxy[] mPrxsArray;
         public int mProgressValue;
         public string mStatus;        
-        public event EventHandler Changed;                
+        public event EventHandler Changed;  
+        /// <summary>
+        /// Calc number of callings of onChange (for slowly computers redraw only each 10th iteration and last)
+        /// </summary>
+        private int mCallId;
 
         //-----------------------------methods---------------------------------
         public void Dispose()
@@ -56,107 +64,77 @@ namespace prxSearcher
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="threads">Need count of proxies</param>
-        /// <param name="searcher">search-system</param>
-        public ProxiesList(int Threads, int Count)
+        /// <param name="Threads">Count of searching threads</param>
+        /// <param name="Count">count of needed proxies</param>
+        /// <param name="SearchersList">list of searcher systems</param>
+        /// <param name="Proxy">searching via proxy?</param>
+        /// <param name="SearchPhrase">seach phrase</param>
+        public ProxiesList(int Threads, int Count, List<Searcher> SearchersList, string Proxy, string SearchPhrase)
         {
-            mThreadsCount = Threads;
-            mPrxsCountNeed = Count;
+            mCallId = 0;
             mPrxsDic = new Dictionary<string, Proxy>();
-            mSearchers = new List<Searcher>();
-
+            mThreadsCount = Threads;
+            mPrxsCountNeed = Count;            
+            mSearchers = SearchersList;
+            mProxy = Proxy;
+            mSearchPhrase = SearchPhrase;
             mPrxsArray = new Proxy[] { };
-
-            mSearchers.Add(new Searcher()
-            {
-                url = "http://www.google.com/search?",
-                step = 10,
-                first = 0,
-                spltr = Searcher.splitter.p20,
-                srchVar = "q",
-                pageVar = "start",
-                regexExpOfResults = "(?<=a href=\"/url\\?q=)http(s)?://[^\"]+"
-            });
-
-            mSearchers.Add(new Searcher()
-            {
-                url = "http://yandex.ru/yandsearch?",
-                step = 1,
-                first = 0,
-                spltr = Searcher.splitter.p20,
-                srchVar = "text",
-                pageVar = "p",
-                regexExpOfResults = "(?<=title-link\" href=\")http(s)?://[^\"]+"
-            });
-
-            mSearchers.Add(new Searcher()
-            {
-                url = "http://nova.rambler.ru/search?",
-                step = 1,
-                first = 1,
-                spltr = Searcher.splitter.add,
-                srchVar = "query",
-                pageVar = "page",
-                regexExpOfResults = "(?<=<span class=\"b-serp__list_item_info_domain\">)[^<>\\[\\]]+(?=</span>)"
-            });            
-
-            mSearchers.Add(new Searcher()
-            {
-                url = "http://www.bing.com/search?",
-                step = 10,
-                first = 1,
-                spltr = Searcher.splitter.add,
-                srchVar = "q",
-                pageVar = "first",
-                regexExpOfResults = "(?<=<cite>).*?(?=</cite>)"
-            });
-
-            mSearchers.Add(new Searcher()
-            {
-                url = "https://search.yahoo.com/search?",
-                step = 10,
-                first = 1,
-                spltr = Searcher.splitter.add,
-                srchVar = "p",
-                pageVar = "b",
-                regexExpOfResults = "(?<=wr-bw\">).*?(?=</span>)"
-            });
-
-            mSearchers.Add(new Searcher()
-            {
-                url = "http://go.mail.ru/search?",
-                step = 10,
-                first = 0,
-                spltr = Searcher.splitter.add,
-                srchVar = "q",
-                pageVar = "sf",
-                regexExpOfResults = "(?<=serp__link\" href=\").*?(?=\")"
-            });
+            mCurrentSearchPageOfSearcher = new Dictionary<Searcher, Dictionary<int, bool>>() { };
         }
         /// <summary>
         /// Start parsing
         /// </summary>
         /// <param name="phrase">Search phrase ex.:proxy list</param>
-        public void GetProxiesList(string phrase)
+        public void GetProxiesList()
         {
             mProxyLoadThreads = new ProxySearcher[mThreadsCount];
-            int idOfSearcher = 0;
 
             for (int i = 0; i < mThreadsCount; i++)
             {
                 foreach (var sr in mSearchers)
                 {
-                    int pageNum = sr.first + sr.step * (i - mSearchers.Count);                    
-                    mProxyLoadThreads[i] = new ProxySearcher(i, idOfSearcher, phrase, pageNum, ref mSearchers, ref mPrxsDic, mPrxsCountNeed);
+                    int pageNum = GetNewPageNumber(sr);
+                    mProxyLoadThreads[i] = new ProxySearcher(this, i, sr, mSearchPhrase, pageNum, ref mSearchers, ref mPrxsDic, mPrxsCountNeed);
                     mProxyLoadThreads[i].mKilled += new ProxySearcher.mKilledEventHandler(UpdateProxyLoadThreadsList);
                     mProxyLoadThreads[i].mPrxsLstUpdated += new EventHandler(OnChanged);
-                    idOfSearcher++;
-                }
-                idOfSearcher = 0;                
+                }               
             }
             mIsRun = true;
             OnChanged(this,EventArgs.Empty);
         }
+        /// <summary>
+        /// Get new not repeated page number for variable of Searcher
+        /// </summary>
+        /// <param name="searcher">Current searcher</param>
+        /// <returns></returns>
+        public int GetNewPageNumber(Searcher searcher)
+        {
+            int result = searcher.first;
+            
+            if (!mCurrentSearchPageOfSearcher.ContainsKey(searcher))
+            {
+                foreach(Searcher s in mSearchers)
+                    mCurrentSearchPageOfSearcher.Add(s, new Dictionary<int, bool> { });
+            }
+            Dictionary<int, bool> dicOfPages = mCurrentSearchPageOfSearcher[searcher];
+
+            lock (mCurrentSearchPageOfSearcher)
+            {
+                for (; ; )
+                {
+                    if (dicOfPages.ContainsKey(result))
+                    {
+                        result += searcher.step;
+                    }
+                    else
+                    {
+                        mCurrentSearchPageOfSearcher[searcher].Add(result, true);
+                        return result;
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Update list of active searching threads
         /// </summary>
@@ -217,6 +195,15 @@ namespace prxSearcher
 
         private void OnChanged(object sender, EventArgs e)
         {
+            //-----for slowly computers redraw only each 10th iteration and last
+            if (mCallId % 10 != 0 && mCallId < mPrxsDic.Count)
+            {
+                mCallId++;
+                return;
+            }
+            mCallId++;
+            //-------------------------
+
             mPrxsArray = new Proxy[mPrxsDic.Count];
 
             int i = 0;
@@ -225,7 +212,7 @@ namespace prxSearcher
                 mPrxsArray[i] = p.Value;
                 i++;
             }
-
+            
             mProgressValue = (!mIsRun) ? 0 : Convert.ToInt32(Math.Round((double)i * 100 / mPrxsCountNeed, 0));
             mStatus = (mIsRun) ? String.Format("Active threads: {0}; Loaded: {1}", mThreadsCount, i) : String.Format("Done; Loaded: {0}", i);
 
@@ -240,7 +227,7 @@ namespace prxSearcher
             else if(mThreadsCount == 0)
             {
                 mIsRun = false;
-            }
+            }            
         }
 
         IEnumerator IEnumerable.GetEnumerator()

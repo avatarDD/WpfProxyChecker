@@ -10,10 +10,17 @@ namespace prxSearcher
 
     class KilledEnentArgs : EventArgs
     {
-        public int mParam { get; }
+        private int _mParam { get; set; }
+        public int mParam
+        {
+            get
+            {
+                return _mParam;
+            }
+        }
         public KilledEnentArgs(int e)
         {
-            mParam = e;
+            _mParam = e;
         }
     }
 }

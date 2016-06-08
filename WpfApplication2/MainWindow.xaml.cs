@@ -71,11 +71,19 @@ namespace prxSearcher
 
         private void menuFindPrxs_Click(object sender, RoutedEventArgs e)
         {
-            pl = new ProxiesList(20, 500);
+            string proxyParam = (mySettings.mUseProxy) ? mySettings.mProxy : "";
+
+            pl = new ProxiesList(mySettings.mThreadsCount,
+                                 mySettings.mNeedProxyCount,
+                                 mySettings.mSearchers,
+                                 proxyParam,
+                                 mySettings.mSearchPhrase);
+            
             dtUnsrtd.ItemsSource = pl;
             pbStatus.Visibility = Visibility.Visible;
+
             pl.Changed += new EventHandler(UpdateDataGrid);            
-            pl.GetProxiesList("proxy list");
+            pl.GetProxiesList();
         }
 
         private void mainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
