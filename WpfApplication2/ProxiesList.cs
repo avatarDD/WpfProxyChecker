@@ -13,8 +13,10 @@ namespace prxSearcher
         /// searchers
         /// </summary>
         private List<Searcher> mSearchers;
-        
-        private Dictionary<Searcher,Dictionary<int,bool>> mCurrentSearchPageOfSearcher;
+        /// <summary>
+        /// Dictionary of used numbers page number variable of searchers
+        /// </summary>
+        private Dictionary<Searcher,Dictionary<int,bool>> mCurrentSearchPageOfSearcherDic;
         /// <summary>
         /// how many proxies needed
         /// </summary>
@@ -79,7 +81,7 @@ namespace prxSearcher
             mProxy = Proxy;
             mSearchPhrase = SearchPhrase;
             mPrxsArray = new Proxy[] { };
-            mCurrentSearchPageOfSearcher = new Dictionary<Searcher, Dictionary<int, bool>>() { };
+            mCurrentSearchPageOfSearcherDic = new Dictionary<Searcher, Dictionary<int, bool>>() { };
         }
         /// <summary>
         /// Start parsing
@@ -111,14 +113,14 @@ namespace prxSearcher
         {
             int result = searcher.first;
             
-            if (!mCurrentSearchPageOfSearcher.ContainsKey(searcher))
+            if (!mCurrentSearchPageOfSearcherDic.ContainsKey(searcher))
             {
                 foreach(Searcher s in mSearchers)
-                    mCurrentSearchPageOfSearcher.Add(s, new Dictionary<int, bool> { });
+                    mCurrentSearchPageOfSearcherDic.Add(s, new Dictionary<int, bool> { });
             }
-            Dictionary<int, bool> dicOfPages = mCurrentSearchPageOfSearcher[searcher];
+            Dictionary<int, bool> dicOfPages = mCurrentSearchPageOfSearcherDic[searcher];
 
-            lock (mCurrentSearchPageOfSearcher)
+            lock (mCurrentSearchPageOfSearcherDic)
             {
                 for (; ; )
                 {
@@ -128,7 +130,7 @@ namespace prxSearcher
                     }
                     else
                     {
-                        mCurrentSearchPageOfSearcher[searcher].Add(result, true);
+                        mCurrentSearchPageOfSearcherDic[searcher].Add(result, true);
                         return result;
                     }
                 }
