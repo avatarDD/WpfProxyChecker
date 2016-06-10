@@ -48,29 +48,27 @@ namespace prxSearcher
             {
                 if (pl == null)
                 {
-                     if (MessageBox.Show("Do you want exit?", "exit", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
+                    if (MessageBox.Show("Do you want exit?", "exit", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
                     {
                         Close();
                     }
                 }
-                else if(pl.mIsRun)
+                else if (pl.mIsRun)
                 {
                     pl.StopProxiesLoading();
                 }
                 else if (MessageBox.Show("Do you want exit?", "exit", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
                 {
                     Close();
-                }              
+                }
             }
-            else if(e.Key == Key.F1)
+            else if (e.Key == Key.F1)
             {
-                MenuAbout_Click(this,null);                
+                MenuAbout_Click(this, null);
             }
-            else if(e.Key == Key.F2)
+            else if (e.Key == Key.F2)
             {
-                SettingsWindow f2 = new SettingsWindow() { DataContext = mySettings };
-                f2.Owner = this;
-                f2.Show();
+                menuSettings_Click(this, null);
             }
         }        
 
@@ -118,6 +116,13 @@ namespace prxSearcher
                 });
             }
             catch (Exception) { }
+        }
+
+        private void menuSettings_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsWindow f2 = new SettingsWindow() { DataContext = mySettings };
+            f2.Owner = this;
+            f2.Show();
         }
     }
 }
