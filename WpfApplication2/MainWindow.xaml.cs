@@ -64,8 +64,11 @@ namespace prxSearcher
                 }              
             }
             else if(e.Key == Key.F1)
-            {            
-                MenuAbout_Click(this,null);
+            {
+                //MenuAbout_Click(this,null);
+                SettingsWindow f2 = new SettingsWindow() { DataContext=mySettings};
+                f2.Owner = this;
+                f2.Show();
             }
         }        
 

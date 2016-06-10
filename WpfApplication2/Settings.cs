@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
+using System.ComponentModel;
 
 namespace prxSearcher
 {
@@ -14,26 +15,27 @@ namespace prxSearcher
     {
         //members
         [DataMember]
-        public int mNeedProxyCount;
+        public int mNeedProxyCount { get; set; }
         [DataMember]
-        public int mThreadsCount;
+        public int mThreadsCount { get; set; }
         [DataMember]
-        public bool mUseProxy;
+        public bool mUseProxy { get; set; }
         [DataMember]
-        public string mProxy;
+        public string mProxy { get; set; }
         [DataMember]
-        public string mSearchPhrase;
+        public string mSearchPhrase { get; set; }
         [DataMember]
-        public List<Searcher> mSearchers;
-        public string mPathToFileSettings;
+        public List<Searcher> mSearchers { get; set; }
         [DataMember]
-        public string mPathToFileResult;
+        public string mPathToFileSettings { get; set; }
+        [DataMember]
+        public string mPathToFileResult { get; set; }
 
         //methods
         public Settings()
         {
             mPathToFileSettings = "Settings.json";            
-        }
+        }       
 
         public void LoadSettings()
         {
@@ -53,11 +55,12 @@ namespace prxSearcher
                     mSearchers = newSettings.mSearchers;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                //RestoreSettingsToDefaults();
-                //SaveSettingsToFile();
-                throw new Exception(String.Format("Can't read settings from file.\r\n{0}\r\n{1}", ex.Message,ex.StackTrace));
+                RestoreSettingsToDefaults();
+                SaveSettingsToFile();
+                LoadSettings();
+                throw new Exception("Can't read settings from file and settings was restored to default");
             }
         }
 
@@ -79,17 +82,16 @@ namespace prxSearcher
 
         public void RestoreSettingsToDefaults()
         {
-            mPathToFileSettings = "Settings.json";
-
             mNeedProxyCount = 500;
             mThreadsCount = 20;
             mUseProxy = false;
             mProxy = "127.0.0.1:3128";
             mSearchPhrase = "proxy list";
             mPathToFileResult = "ProxiesList.txt";
+            mPathToFileSettings = "Settings.json";
 
             mSearchers = new List<Searcher>();
-
+            
             mSearchers.Add(new Searcher()
             {
                 url = "http://www.google.com/search?",
@@ -136,7 +138,7 @@ namespace prxSearcher
 
             mSearchers.Add(new Searcher()
             {
-                url = "https://search.yahoo.com/search?",
+                url = "http://search.yahoo.com/search?",
                 step = 10,
                 first = 1,
                 spltr = Searcher.splitter.add,
