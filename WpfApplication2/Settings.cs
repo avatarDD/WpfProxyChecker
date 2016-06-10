@@ -60,14 +60,20 @@ namespace prxSearcher
                 RestoreSettingsToDefaults();
                 SaveSettingsToFile();
                 LoadSettings();
-                throw new Exception("Can't read settings from file and settings was restored to default");
+                //throw new Exception("Can't read settings from file and settings was restored to default");
             }
+        }
+
+        private void RemoveSettingsFile()
+        {
+            File.Delete(mPathToFileSettings);
         }
 
         public void SaveSettingsToFile()
         {
             try
             {
+                RemoveSettingsFile();
                 DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(Settings));
                 using (FileStream fs = new FileStream(mPathToFileSettings, FileMode.OpenOrCreate))
                 {
@@ -82,6 +88,7 @@ namespace prxSearcher
 
         public void RestoreSettingsToDefaults()
         {
+            RemoveSettingsFile();
             mNeedProxyCount = 500;
             mThreadsCount = 20;
             mUseProxy = false;
@@ -91,13 +98,13 @@ namespace prxSearcher
             mPathToFileSettings = "Settings.json";
 
             mSearchers = new List<Searcher>();
-           
+            
             mSearchers.Add(new Searcher()
             {
                 url = "http://www.google.com/search?",
                 step = 10,
                 first = 0,
-                spltr = Searcher.splitter.p20,
+                spltr = "%",
                 srchVar = "q",
                 pageVar = "start",
                 regexExpOfResults = "(?<=a href=\"/url\\?q=)http(s)?://[^\"]+"
@@ -108,7 +115,7 @@ namespace prxSearcher
                 url = "http://yandex.ru/yandsearch?",
                 step = 1,
                 first = 0,
-                spltr = Searcher.splitter.p20,
+                spltr = "%",
                 srchVar = "text",
                 pageVar = "p",
                 regexExpOfResults = "(?<=title-link\" href=\")http(s)?://[^\"]+"
@@ -119,7 +126,7 @@ namespace prxSearcher
                 url = "http://nova.rambler.ru/search?",
                 step = 1,
                 first = 1,
-                spltr = Searcher.splitter.add,
+                spltr = "+",
                 srchVar = "query",
                 pageVar = "page",
                 regexExpOfResults = "(?<=<span class=\"b-serp__list_item_info_domain\">)[^<>\\[\\]]+(?=</span>)"
@@ -130,7 +137,7 @@ namespace prxSearcher
                 url = "http://www.bing.com/search?",
                 step = 10,
                 first = 1,
-                spltr = Searcher.splitter.add,
+                spltr = "+",
                 srchVar = "q",
                 pageVar = "first",
                 regexExpOfResults = "(?<=<cite>).*?(?=</cite>)"
@@ -141,7 +148,7 @@ namespace prxSearcher
                 url = "http://search.yahoo.com/search?",
                 step = 10,
                 first = 1,
-                spltr = Searcher.splitter.add,
+                spltr = "+",
                 srchVar = "p",
                 pageVar = "b",
                 regexExpOfResults = "(?<=wr-bw\">).*?(?=</span>)"
@@ -152,7 +159,7 @@ namespace prxSearcher
                 url = "http://go.mail.ru/search?",
                 step = 10,
                 first = 0,
-                spltr = Searcher.splitter.add,
+                spltr = "+",
                 srchVar = "q",
                 pageVar = "sf",
                 regexExpOfResults = "(?<=serp__link\" href=\").*?(?=\")"

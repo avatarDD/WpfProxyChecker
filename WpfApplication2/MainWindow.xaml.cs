@@ -55,7 +55,6 @@ namespace prxSearcher
                 }
                 else if(pl.mIsRun)
                 {
-                    //Task.Run(() => { pl.StopProxiesLoading(); });
                     pl.StopProxiesLoading();
                 }
                 else if (MessageBox.Show("Do you want exit?", "exit", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
@@ -65,8 +64,11 @@ namespace prxSearcher
             }
             else if(e.Key == Key.F1)
             {
-                //MenuAbout_Click(this,null);
-                SettingsWindow f2 = new SettingsWindow() { DataContext=mySettings};
+                MenuAbout_Click(this,null);                
+            }
+            else if(e.Key == Key.F2)
+            {
+                SettingsWindow f2 = new SettingsWindow() { DataContext = mySettings };
                 f2.Owner = this;
                 f2.Show();
             }

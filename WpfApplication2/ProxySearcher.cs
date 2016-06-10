@@ -55,7 +55,7 @@ namespace prxSearcher
             txtQuery.Append("&");
             txtQuery.Append(mSearcher.srchVar);
             txtQuery.Append("=");
-            txtQuery.Append(mSearchPhrase.Replace(" ", ((char)mSearcher.spltr).ToString()));
+            txtQuery.Append(mSearchPhrase.Replace(" ", mSearcher.spltr));
             txtQuery.Append("&");
             txtQuery.Append(mSearcher.pageVar);
             txtQuery.Append("=");

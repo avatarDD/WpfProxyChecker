@@ -18,23 +18,13 @@ namespace prxSearcher
         [DataMember]
         public int first { get; set; }
         [DataMember]
-        public splitter spltr { get; set; }
+        public string spltr { get; set; }
         [DataMember]
         public string srchVar { get; set; }
         [DataMember]
         public string pageVar { get; set; }
         [DataMember]
         public string regexExpOfResults { get; set; }
-
-        /// <summary>
-        /// разделитель в искомой фразе
-        /// </summary>
-        public enum splitter
-        {
-            add = 43, //+
-            p20 = 37, //%
-            space = 32 //space
-        }
 
         public override string ToString()
         {            
