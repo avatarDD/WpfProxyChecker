@@ -91,7 +91,7 @@ namespace prxSearcher
             mPathToFileSettings = "Settings.json";
 
             mSearchers = new List<Searcher>();
-            
+           
             mSearchers.Add(new Searcher()
             {
                 url = "http://www.google.com/search?",

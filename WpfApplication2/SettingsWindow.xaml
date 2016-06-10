@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:prxSearcher"
         mc:Ignorable="d"
-        Title="SettingsWindow" MaxWidth="500" MaxHeight="450" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow" KeyDown="Window_KeyDown">
+        Title="SettingsWindow" MaxWidth="520" MaxHeight="450" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow" KeyDown="Window_KeyDown">
     <Grid  Background="#FFF3E9E9" >
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -44,10 +44,10 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="120"/>
-                <ColumnDefinition Width="160"/>
+                <ColumnDefinition Width="200"/>
             </Grid.ColumnDefinitions>
 
-            <ListBox Grid.Row="2" Grid.Column="0" x:Name="listBox" MaxWidth="200" HorizontalAlignment="Center" Margin="5,5,5,5" ItemsSource="{Binding mSearchers,UpdateSourceTrigger=Explicit}">
+            <ListBox Grid.Row="2" Grid.Column="0" x:Name="listBox" MaxWidth="200" HorizontalAlignment="Center" Margin="5,5,5,5" ItemsSource="{Binding mSearchers,UpdateSourceTrigger=Explicit}" SelectionChanged="listBox_SelectionChanged">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
                         <Setter Property="Margin" Value="5"/>
@@ -88,14 +88,14 @@
                 <Label VerticalAlignment="Center">Regular expression</Label>
             </StackPanel>
                                    
-            <StackPanel Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left" >
-                <TextBox x:Name="url" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding mSearchers[listBox.SelectedIndex],UpdateSourceTrigger=Explicit}"/>
-                <TextBox x:Name="step" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <TextBox x:Name="first" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <TextBox x:Name="spltr" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <TextBox x:Name="srchVar" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                <TextBox x:Name="pageVar" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <TextBox x:Name="regexExpOfResults" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <StackPanel Name="sP" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left" >
+                <TextBox x:Name="url" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding url}"/>
+                <TextBox x:Name="step" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding step}"/>
+                <TextBox x:Name="first" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding first}" />
+                <TextBox x:Name="spltr" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding spltr}"/>
+                <TextBox x:Name="srchVar" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding srchVar}"  />
+                <TextBox x:Name="pageVar" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding pageVar}"/>
+                <TextBox x:Name="regexExpOfResults" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding regexExpOfResults}"/>
             </StackPanel>
         </Grid>
         <Button Grid.Row="3"  Content="Save" Width="50" HorizontalAlignment="Right" Margin="5,5,5,5" Click="Button_Click"></Button>

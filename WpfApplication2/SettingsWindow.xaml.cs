@@ -19,12 +19,9 @@ namespace prxSearcher
     /// </summary>
     public partial class SettingsWindow : Window
     {
-        private Settings s;
-
         public SettingsWindow()
         {
             InitializeComponent();
-            this.Loaded += new RoutedEventHandler(Page_Loaded);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -32,18 +29,23 @@ namespace prxSearcher
             MessageBox.Show(DataContext.ToString());
         }
 
-        private void Page_Loaded(object sender, EventArgs e)
-        {
-            //s = DataContext as Settings;
-            //ThreadsCount.DataContext = DataContext;
-            //gSettings.DataContext = this.DataContext;
-        }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
                 Close();
+            }
+        }
+
+        private void listBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var s = DataContext as Settings;
+            var lb = sender as ListBox;
+            if (lb.SelectedIndex > -1)
+            {
+                sP.DataContext = s.mSearchers[lb.SelectedIndex];
+                sP.UpdateLayout();
             }
         }
     }
