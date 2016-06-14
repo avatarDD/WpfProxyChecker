@@ -32,7 +32,8 @@ namespace prxSearcher
         /// <summary>
         /// Status of searhing
         /// </summary>
-        public bool mIsRun { get; set; }        
+        public bool mIsRunFinding { get; set; } 
+        public bool mIsRunTesting { get; set; }       
         /// <summary>
         /// The dictionary that contain proxies list
         /// </summary>
@@ -90,6 +91,7 @@ namespace prxSearcher
         public void GetProxiesList()
         {
             mProxyLoadThreads = new ProxySearcher[mThreadsCount];
+            mIsRunFinding = true;
 
             for (int i = 0; i < mThreadsCount; i++)
             {
@@ -101,7 +103,7 @@ namespace prxSearcher
                     mProxyLoadThreads[i].mPrxsLstUpdated += new EventHandler(OnChanged);
                 }               
             }
-            mIsRun = true;
+
             OnChanged(this,EventArgs.Empty);
         }
 
@@ -109,8 +111,10 @@ namespace prxSearcher
         /// Test proxies Dictionary
         /// </summary>
         public void TestProxiesDictionary(int Threads, string Target)
-        {
+        {            
             mThreadsCount = Threads;
+            mIsRunTesting = true;
+            mCallId = 0;
 
             mTestProxiesThreads = new TestProxies[mThreadsCount];
 
@@ -133,7 +137,7 @@ namespace prxSearcher
                 mTestProxiesThreads[i].mTstDead += new EventHandler(TestProxiesThreadsListUpdate);
                 mTestProxiesThreads[i].mPrxsLstUpdated += new EventHandler(OnChanged);
             }
-            mIsRun = true;
+
             OnChanged(this, EventArgs.Empty);
         }
 
@@ -238,14 +242,23 @@ namespace prxSearcher
         /// </summary>
         public void StopProxiesLoading()
         {
-            while (mIsRun)
+            while (mIsRunFinding)
             {
                 for (int i = 0; i < mProxyLoadThreads.Length; i++)
                 {
                     mProxyLoadThreads[i].StopLoading();
                 }
-                mIsRun = (mProxyLoadThreads.Length > 0) ? true:false;
+                mIsRunFinding = (mProxyLoadThreads.Length > 0) ? true:false;
             }
+
+            while (mIsRunTesting)
+            {
+                for (int i = 0; i < mProxyLoadThreads.Length; i++)
+                {
+                    mProxyLoadThreads[i].StopLoading();
+                }
+                mIsRunTesting = (mProxyLoadThreads.Length > 0) ? true : false;
+            }            
         }
 
         private void OnChanged(object sender, EventArgs e)
@@ -268,18 +281,27 @@ namespace prxSearcher
                 i++;
             }
 
-            if (mPrxsDic.Count > mPrxsCountNeed)
+            if (mPrxsDic.Count > mPrxsCountNeed && mIsRunFinding)
             {
                 StopProxiesLoading();
             }
 
             if(mThreadsCount ==0)
             {
-                mIsRun = false;
+                mIsRunFinding = false;
+                mIsRunTesting = false;
             }
 
-            mProgressValue = (!mIsRun) ? 0 : Convert.ToInt32(Math.Round((double)i * 100 / mPrxsCountNeed, 0));
-            mStatus = (mIsRun) ? string.Format("Active threads: {0}; Loaded: {1}", mThreadsCount, i) : String.Format("Done; Loaded: {0}", i);
+
+            mProgressValue = (!mIsRunFinding) ? 0 : Convert.ToInt32(Math.Round((double)i * 100 / mPrxsCountNeed, 0));
+            mStatus = (mIsRunFinding) ? string.Format("Active threads: {0}; Loaded: {1}", mThreadsCount, i) : String.Format("Done; Loaded: {0}", i);
+
+
+            //if (mIsRunTesting)
+            //{
+            //    mProgressValue = (!mIsRunTesting) ? 0 : Convert.ToInt32(Math.Round((double)(mPrxsCountNeed - i) * 100 / mPrxsCountNeed, 0));
+            //    mStatus = (mIsRunFinding) ? string.Format("Active threads: {0}; Tested: {1}", mThreadsCount, mPrxsCountNeed - i) : String.Format("Done; Loaded: {0}", i);
+            //}            
 
             if (Changed != null)
                 Changed(this, EventArgs.Empty);

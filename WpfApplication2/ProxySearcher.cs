@@ -135,7 +135,7 @@ namespace prxSearcher
         {
             int i = int.Parse(mT.Name);        
             mIsRun = false;
-            //mT.Join();
+            mT.Join(1000);
             mKilled(this, new KilledEventArgs(i));
         }
     }

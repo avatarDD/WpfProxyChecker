@@ -45,7 +45,7 @@ namespace prxSearcher
                 case Key.Escape: 
                     if (pl != null)
                     {
-                        if (pl.mIsRun)
+                        if (pl.mIsRunFinding)
                         {
                             pl.StopProxiesLoading();
                         }
@@ -88,7 +88,7 @@ namespace prxSearcher
         {
             if(pl != null)
             {
-                if(pl.mIsRun)
+                if(pl.mIsRunFinding)
                 {
                     MessageBox.Show("Already running","Warning",MessageBoxButton.OK,MessageBoxImage.Warning);
                     return;
@@ -123,7 +123,7 @@ namespace prxSearcher
                 {
                     CollectionViewSource.GetDefaultView(dtUnsrtd.ItemsSource).Refresh();
                     pbStatus.Value = pl.mProgressValue;
-                    if (pbStatus.Value == 0 && !pl.mIsRun)
+                    if (pbStatus.Value == 0 && !pl.mIsRunFinding)
                     {
                         pbStatus.Visibility = Visibility.Collapsed;
                         string pathToWav = String.Format(@"{0}\Media\Windows Notify.wav", Environment.GetEnvironmentVariable("SystemRoot"));
