@@ -1,13 +1,9 @@
-﻿using System.Windows;
-using System.Windows.Input;
-using System.Collections;
-using System.Windows.Data;
-using System.Windows.Controls;
-using System;
-using System.Media;
-using System.Threading.Tasks;
+﻿using System;
 using System.Diagnostics;
-using System.Threading;
+using System.Media;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Input;
 
 namespace prxSearcher
 {
@@ -98,7 +94,7 @@ namespace prxSearcher
                     return;
                 }
             }
-            string proxyParam = (mySettings.mUseProxy) ? mySettings.mProxy : "";
+            string proxyParam = (mySettings.mUseProxy) ? mySettings.mProxy : String.Empty;
 
             pl = new ProxiesList(mySettings.mThreadsCount,
                                  mySettings.mNeedProxyCount,
@@ -145,7 +141,7 @@ namespace prxSearcher
         private void menuTestPrxs_Click(object sender, RoutedEventArgs e)
         {
             if (pl != null)
-                pl.TestProxiesDictionary("http://whatismyipaddress.com/");
+                pl.TestProxiesDictionary(mySettings.mThreadsCount, "http://whatismyipaddress.com/");
         }
     }
 }

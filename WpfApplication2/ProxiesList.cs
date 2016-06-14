@@ -96,7 +96,7 @@ namespace prxSearcher
                 foreach (var sr in mSearchers)
                 {
                     int pageNum = GetNewPageNumber(sr);
-                    mProxyLoadThreads[i] = new ProxySearcher(this, i, sr, mSearchPhrase, pageNum, ref mSearchers, ref mPrxsDic, mPrxsCountNeed);
+                    mProxyLoadThreads[i] = new ProxySearcher(this, i, sr, mSearchPhrase, pageNum, ref mSearchers, ref mPrxsDic, mPrxsCountNeed, mProxy);
                     mProxyLoadThreads[i].mKilled += new ProxySearcher.mKilledEventHandler(UpdateProxyLoadThreadsList);
                     mProxyLoadThreads[i].mPrxsLstUpdated += new EventHandler(OnChanged);
                 }               
@@ -108,22 +108,29 @@ namespace prxSearcher
         /// <summary>
         /// Test proxies Dictionary
         /// </summary>
-        public void TestProxiesDictionary(string Target)
+        public void TestProxiesDictionary(int Threads, string Target)
         {
+            mThreadsCount = Threads;
+
             mTestProxiesThreads = new TestProxies[mThreadsCount];
 
             int xStartFrom = 0;
             int xLength = mPrxsArray.Length / mThreadsCount;
+            int xRemainder = mPrxsArray.Length % mThreadsCount;
             if (xLength == 0)
                 return;
 
             for (int i=0;i<mThreadsCount;i++)
             {
-                Proxy[] partOfArray = new Proxy[] { };
+                if(i+1 >= mThreadsCount)
+                {
+                    xLength += xRemainder;
+                }
+                Proxy[] partOfArray = new Proxy[xLength];
                 Array.Copy(mPrxsArray, xStartFrom, partOfArray, 0, xLength);
                 xStartFrom += xLength;
                 mTestProxiesThreads[i] = new TestProxies(ref mPrxsDic, Target, partOfArray);
-                mTestProxiesThreads[i].mTstDead += new EventHandler(TestProxiesThreadsList);
+                mTestProxiesThreads[i].mTstDead += new EventHandler(TestProxiesThreadsListUpdate);
                 mTestProxiesThreads[i].mPrxsLstUpdated += new EventHandler(OnChanged);
             }
             mIsRun = true;
@@ -170,34 +177,51 @@ namespace prxSearcher
         /// <param name="e"></param>
         private void UpdateProxyLoadThreadsList(object sender, KilledEventArgs e)
         {
-            ProxySearcher[] a = new ProxySearcher[mProxyLoadThreads.Length - 1];
-            int k=0;
+            if (mThreadsCount == 0)
+                return;
 
-            for (int i = 0; i < mProxyLoadThreads.Length; i++)
+            lock (mProxyLoadThreads)
             {
-                if (mProxyLoadThreads[i].mId != e.mParam)
+                if (mThreadsCount > 0)
                 {
-                    a[i-k] = mProxyLoadThreads[i];
-                }
-                else
-                {
-                    k = 1;                    
-                    continue;
-                }
-            }
-            mProxyLoadThreads = a;
-            mThreadsCount = mProxyLoadThreads.Length;
+                    ProxySearcher[] a = new ProxySearcher[mThreadsCount - 1];
 
-            OnChanged(this, EventArgs.Empty);
+                    int k = 0;
+                    for (int i = 0; i < mThreadsCount; i++)
+                    {
+                        if (mProxyLoadThreads[i].mId != e.mParam)
+                        {
+                            if (i - k < a.Length)
+                            {
+                                a[i - k] = mProxyLoadThreads[i];
+                            }
+                            else
+                            {
+                                mThreadsCount = mProxyLoadThreads.Length;
+                                OnChanged(this, EventArgs.Empty);
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            k = 1;
+                            continue;
+                        }
+                    }
+                    mProxyLoadThreads = a;
+                    mThreadsCount = mProxyLoadThreads.Length;
+                }
+                OnChanged(this, EventArgs.Empty);
+            }
         }
         
-        private void TestProxiesThreadsList(object sender, EventArgs e)
+        private void TestProxiesThreadsListUpdate(object sender, EventArgs e)
         {
             TestProxies[] a = new TestProxies[mThreadsCount - 1];
             int k = 0;
-            for(int i = 0; i < mThreadsCount; i++)
+            for (int i = 0; i < mThreadsCount; i++)
             {
-                if(mTestProxiesThreads[i].mIsRun)
+                if (mTestProxiesThreads[i].mIsRun)
                 {
                     a[k] = mTestProxiesThreads[i];
                     k++;
@@ -209,19 +233,6 @@ namespace prxSearcher
             OnChanged(this, EventArgs.Empty);
         }
 
-        /// <summary>
-        /// delete proxy from dictionary
-        /// </summary>
-        /// <param name="Value"></param>
-        public void Remove(object Value)
-        {
-            Proxy p = (Proxy)Value;
-            if (mPrxsDic.ContainsKey(p.adress))
-            {
-                mPrxsDic.Remove(p.adress);
-                OnChanged(this,EventArgs.Empty);
-            }
-        }
         /// <summary>
         /// stop searching of proxies
         /// </summary>
@@ -256,22 +267,23 @@ namespace prxSearcher
                 mPrxsArray[i] = p.Value;
                 i++;
             }
-            
+
+            if (mPrxsDic.Count > mPrxsCountNeed)
+            {
+                StopProxiesLoading();
+            }
+
+            if(mThreadsCount ==0)
+            {
+                mIsRun = false;
+            }
+
             mProgressValue = (!mIsRun) ? 0 : Convert.ToInt32(Math.Round((double)i * 100 / mPrxsCountNeed, 0));
             mStatus = (mIsRun) ? string.Format("Active threads: {0}; Loaded: {1}", mThreadsCount, i) : String.Format("Done; Loaded: {0}", i);
 
             if (Changed != null)
                 Changed(this, EventArgs.Empty);
-
-            if(mPrxsDic.Count > mPrxsCountNeed)
-            {
-                StopProxiesLoading();
-                mIsRun = false;
-            }
-            else if(mThreadsCount == 0)
-            {
-                mIsRun = false;
-            }            
+        
         }
 
         IEnumerator IEnumerable.GetEnumerator()

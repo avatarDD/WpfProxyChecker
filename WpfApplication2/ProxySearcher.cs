@@ -13,6 +13,7 @@ namespace prxSearcher
         private Searcher mSearcher;
         private ProxiesList mSender;
         private string mSearchPhrase;
+        private string mProxy;
         private Dictionary<string, Proxy> mPrxsDic;
         private int mPrxsCountNeed;
         public delegate void mKilledEventHandler(object sender, KilledEventArgs e);
@@ -20,14 +21,15 @@ namespace prxSearcher
         public event EventHandler mPrxsLstUpdated;
 
         //methods
-        public ProxySearcher(ProxiesList sender, int NameOfThread, Searcher sr, string SearchPhrase, int StartFromPage, ref List<Searcher> SearchersList, ref Dictionary<string, Proxy> PrxsDic, int PrxsCountNeed)
+        public ProxySearcher(ProxiesList sender, int NameOfThread, Searcher sr, string SearchPhrase, int StartFromPage, ref List<Searcher> SearchersList, ref Dictionary<string, Proxy> PrxsDic, int PrxsCountNeed, string useProxy)
         {
             mSearcher = sr;
             mSearchPhrase = SearchPhrase;
             mSender = sender;
             mPrxsDic = PrxsDic;
             mPrxsCountNeed = PrxsCountNeed;
-            
+            mProxy = useProxy;
+
             mT = new Thread(new ThreadStart(ProxyToAssemble));
             mT.Name = NameOfThread.ToString();
             mId = NameOfThread;
@@ -63,10 +65,13 @@ namespace prxSearcher
                 string html = "";
                 string uri = txtQuery.ToString() + mSender.GetNewPageNumber(mSearcher).ToString();
                 double t;
-                if (Web_Client.Get(uri, string.Empty, out html, out t))
+                if (Web_Client.Get(uri, mProxy, out html, out t))
                 {
                     if (html.ToLower().Contains("captcha"))
+                    {
                         StopLoading();
+                        return;
+                    }
                     ParseProxies(html_parser.Matches(html, mSearcher.regexExpOfResults));
                 }
 
@@ -101,6 +106,7 @@ namespace prxSearcher
                                 {
                                     Proxy newProxy = new Proxy();
                                     newProxy.adress = p;
+                                    newProxy.latency = -1;
                                     Add(newProxy);
                                 }
                             }
@@ -128,10 +134,9 @@ namespace prxSearcher
         public void StopLoading()
         {
             int i = int.Parse(mT.Name);        
-            mIsRun = false;            
-            mT.Join();
-            //if(mT.ThreadState == ThreadState.Stopped)
-                mKilled(this, new KilledEventArgs(i));
+            mIsRun = false;
+            //mT.Join();
+            mKilled(this, new KilledEventArgs(i));
         }
     }
 }

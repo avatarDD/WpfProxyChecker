@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace prxSearcher
 {
@@ -65,7 +62,7 @@ namespace prxSearcher
             string type_p = GetTypeOfProxy(html);
             lock (mPrxsDic)
             {
-                mPrxsDic[prx.adress].latency = t;
+                mPrxsDic[prx.adress].latency = Math.Round(t, 2);
                 mPrxsDic[prx.adress].country = country;
                 mPrxsDic[prx.adress].type = type_p;
                 mPrxsLstUpdated(this, EventArgs.Empty);
