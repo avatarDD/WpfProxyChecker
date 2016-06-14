@@ -8,7 +8,7 @@ namespace prxSearcher
 {
 
 
-    class KilledEnentArgs : EventArgs
+    class KilledEventArgs : EventArgs
     {
         private int _mParam { get; set; }
         public int mParam
@@ -18,7 +18,7 @@ namespace prxSearcher
                 return _mParam;
             }
         }
-        public KilledEnentArgs(int e)
+        public KilledEventArgs(int e)
         {
             _mParam = e;
         }

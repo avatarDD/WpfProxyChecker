@@ -22,13 +22,14 @@ namespace prxSearcher
         public SettingsWindow()
         {
             InitializeComponent();
+            ThreadsCount.Focus();
         }
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
             var s = DataContext as Settings;
             s.SaveSettingsToFile();
-            MessageBox.Show("Settings were saved");
+            MessageBox.Show("Settings were saved","Info",MessageBoxButton.OK,MessageBoxImage.Information,MessageBoxResult.OK);
         }
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)

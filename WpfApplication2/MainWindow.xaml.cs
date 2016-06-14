@@ -34,7 +34,7 @@ namespace prxSearcher
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             string version = fvi.FileVersion;
 
-            MessageBox.Show(String.Format("ver: {0}", version));
+            MessageBox.Show(string.Format("ver: {0}", version),"About program",MessageBoxButton.OK,MessageBoxImage.Information,MessageBoxResult.OK);
         }
 
         private void menuExit_Click(object sender, RoutedEventArgs e)
@@ -44,38 +44,60 @@ namespace prxSearcher
 
         private void mainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Escape)
+            switch(e.Key)
             {
-                if (pl == null)
-                {
-                     if (MessageBox.Show("Do you want exit?", "exit", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
+                case Key.Escape: 
+                    if (pl != null)
                     {
-                        Close();
+                        if (pl.mIsRun)
+                        {
+                            pl.StopProxiesLoading();
+                        }
+                        else if (MessageBox.Show("Do you want exit?", "exit", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
+                        {
+                            Close();
+                        }
                     }
-                }
-                else if(pl.mIsRun)
-                {
-                    pl.StopProxiesLoading();
-                }
-                else if (MessageBox.Show("Do you want exit?", "exit", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
-                {
-                    Close();
-                }              
-            }
-            else if(e.Key == Key.F1)
-            {
-                MenuAbout_Click(this,null);                
-            }
-            else if(e.Key == Key.F2)
-            {
-                SettingsWindow f2 = new SettingsWindow() { DataContext = mySettings };
-                f2.Owner = this;
-                f2.Show();
+                    else
+                    {
+                        if (MessageBox.Show("Do you want exit?", "exit", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
+                        {
+                            Close();
+                        }
+                    }
+                    break;
+                case Key.F1:
+                    MenuAbout_Click(this, null);
+                    break;
+                case Key.F2:
+                    menuSettings_Click(this, null);
+                    break;
+                case Key.F5:                    
+                    menuFindPrxs_Click(this, null);
+                    break;
+                case Key.F6:
+                    menuTestPrxs_Click(this, null);
+                    break;
             }
         }        
 
+        private void menuSettings_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsWindow f2 = new SettingsWindow() { DataContext = mySettings };
+            f2.Owner = this;
+            f2.Show();
+        }
+
         private void menuFindPrxs_Click(object sender, RoutedEventArgs e)
         {
+            if(pl != null)
+            {
+                if(pl.mIsRun)
+                {
+                    MessageBox.Show("Already running","Warning",MessageBoxButton.OK,MessageBoxImage.Warning);
+                    return;
+                }
+            }
             string proxyParam = (mySettings.mUseProxy) ? mySettings.mProxy : "";
 
             pl = new ProxiesList(mySettings.mThreadsCount,
@@ -118,6 +140,12 @@ namespace prxSearcher
                 });
             }
             catch (Exception) { }
+        }
+
+        private void menuTestPrxs_Click(object sender, RoutedEventArgs e)
+        {
+            if (pl != null)
+                pl.TestProxiesDictionary("http://whatismyipaddress.com/");
         }
     }
 }
