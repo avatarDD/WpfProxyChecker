@@ -42,8 +42,9 @@ namespace prxSearcher
                 double t;                               
                 if(Web_Client.Get(mTarget, mArray[i].adress, out html, out t))
                 {
-                    FillProperties(mArray[i], html, t);
-                }else
+                    FillProperties(mArray[i], html, t, "http");
+                }
+                else
                 {
                     lock(mPrxsDic)
                     {
@@ -52,17 +53,16 @@ namespace prxSearcher
                     }
                 }
             }
-            mIsRun = false;
-            mTstDead(this, EventArgs.Empty);
+            StopTestingFromThis();
         }
 
-        private void FillProperties(Proxy prx, string html, double t)
+        private void FillProperties(Proxy prx, string html, double t, string proxyType)
         {
             string country = GetCountry(html);
-            string type_p = GetTypeOfProxy(html);
+            string type_p = (proxyType == String.Empty)?GetTypeOfProxy(html) : proxyType;
             lock (mPrxsDic)
             {
-                mPrxsDic[prx.adress].latency = Math.Round(t, 2);
+                mPrxsDic[prx.adress].latency = Math.Round(t, 0);
                 mPrxsDic[prx.adress].country = country;
                 mPrxsDic[prx.adress].type = type_p;
                 mPrxsLstUpdated(this, EventArgs.Empty);
@@ -83,6 +83,12 @@ namespace prxSearcher
         {
             mIsRun = false;
             mT.Join();
+            mTstDead(this, EventArgs.Empty);
+        }
+
+        private void StopTestingFromThis()
+        {
+            mIsRun = false;
             mTstDead(this, EventArgs.Empty);
         }
     }

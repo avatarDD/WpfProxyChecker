@@ -78,9 +78,7 @@ namespace prxSearcher
                 Thread.Sleep(200);
             }
 
-            mIsRun = false;
-            int i = int.Parse(mT.Name);
-            mKilled(this, new KilledEventArgs(i));
+            StopLoadingFromThis();
         }
 
         private void ParseProxies(string[] Urls)
@@ -135,7 +133,17 @@ namespace prxSearcher
         {
             int i = int.Parse(mT.Name);        
             mIsRun = false;
-            mT.Join(1000);
+            mT.Join();
+            mKilled(this, new KilledEventArgs(i));
+        }
+
+        /// <summary>
+        /// Without blocking of calling thread
+        /// </summary>
+        private void StopLoadingFromThis()
+        {
+            int i = int.Parse(mT.Name);
+            mIsRun = false;
             mKilled(this, new KilledEventArgs(i));
         }
     }

@@ -47,7 +47,11 @@ namespace prxSearcher
                     {
                         if (pl.mIsRunFinding)
                         {
-                            pl.StopProxiesLoading();
+                            pl.StopProxiesWorkers();
+                        }
+                        else if(pl.mIsRunTesting)
+                        {
+                            pl.StopProxiesWorkers();                            
                         }
                         else if (MessageBox.Show("Do you want exit?", "exit", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
                         {
@@ -90,7 +94,12 @@ namespace prxSearcher
             {
                 if(pl.mIsRunFinding)
                 {
-                    MessageBox.Show("Already running","Warning",MessageBoxButton.OK,MessageBoxImage.Warning);
+                    MessageBox.Show("Already finding is running","Warning",MessageBoxButton.OK,MessageBoxImage.Warning);
+                    return;
+                }
+                else if(pl.mIsRunTesting)
+                {
+                    MessageBox.Show("Already testing is running", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
             }
@@ -123,7 +132,7 @@ namespace prxSearcher
                 {
                     CollectionViewSource.GetDefaultView(dtUnsrtd.ItemsSource).Refresh();
                     pbStatus.Value = pl.mProgressValue;
-                    if (pbStatus.Value == 0 && !pl.mIsRunFinding)
+                    if (pbStatus.Value == 0 && !pl.mIsRunFinding && !pl.mIsRunTesting)
                     {
                         pbStatus.Visibility = Visibility.Collapsed;
                         string pathToWav = String.Format(@"{0}\Media\Windows Notify.wav", Environment.GetEnvironmentVariable("SystemRoot"));
@@ -141,7 +150,14 @@ namespace prxSearcher
         private void menuTestPrxs_Click(object sender, RoutedEventArgs e)
         {
             if (pl != null)
+            {
                 pl.TestProxiesDictionary(mySettings.mThreadsCount, "http://whatismyipaddress.com/");
+                pbStatus.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                MessageBox.Show("First find the proxies.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
     }
 }

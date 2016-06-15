@@ -28,12 +28,10 @@ namespace prxSearcher
 
                 if (Proxy != "")
                 {
-                    request.Proxy = new WebProxy(Proxy);
+                    request.Proxy = new WebProxy(Proxy);                    
                 }
-                //---------
-                //request.Proxy = new WebProxy("127.0.0.1:3128");
-                //---------
-                request.Timeout = 8000;
+
+                request.Timeout = 10000;
 
                 DateTime start = DateTime.Now;
 
