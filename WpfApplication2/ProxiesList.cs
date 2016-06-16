@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -47,6 +48,7 @@ namespace prxSearcher
         public Proxy[] mPrxsArray;
         public int mProgressValue;
         public string mStatus;
+        public bool mPrxsFound;
         public event EventHandler Changed;
 
         //-----------------------------methods---------------------------------
@@ -106,7 +108,7 @@ namespace prxSearcher
         /// <summary>
         /// Test proxies Dictionary
         /// </summary>
-        public void TestProxiesDictionary(int Threads, string Target)
+        public void TestProxiesDictionary(int Threads, string Target, string RegexCountry)
         {
             mThreadsCount = Threads;
             mIsRunTesting = true;
@@ -129,7 +131,7 @@ namespace prxSearcher
                 Proxy[] partOfArray = new Proxy[xLength];
                 Array.Copy(mPrxsArray, xStartFrom, partOfArray, 0, xLength);
                 xStartFrom += xLength;
-                mTestProxiesThreads[i] = new TestProxies(ref mPrxsDic, Target, partOfArray);
+                mTestProxiesThreads[i] = new TestProxies(ref mPrxsDic, Target, partOfArray, RegexCountry);
                 mTestProxiesThreads[i].mTstDead += new EventHandler(TestProxiesThreadsListUpdate);
                 mTestProxiesThreads[i].mPrxsLstUpdated += new EventHandler(OnChanged);
             }
@@ -290,6 +292,8 @@ namespace prxSearcher
                 i++;
             }
 
+            mPrxsFound = (i>0)?true:false;
+
             if (mIsRunFinding)
             {
                 if (Convert.ToInt32(Math.Round((double)i * 100 / mPrxsCountNeed, 0)) >= 100 && mThreadsCount == 0)
@@ -315,6 +319,27 @@ namespace prxSearcher
             }
 
             Changed(this, EventArgs.Empty);            
+        }
+
+        public void SaveResultToFile(string path)
+        {
+            using (StreamWriter sw = new StreamWriter(path))
+            {
+                try
+                {
+                    foreach (KeyValuePair<string, Proxy> i in mPrxsDic)
+                    {
+                        sw.WriteLine(i.Value.adress);
+                    }
+                }
+                catch (Exception)
+                { }
+                finally
+                {
+                    if(sw!=null)
+                        sw.Close();
+                }
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()

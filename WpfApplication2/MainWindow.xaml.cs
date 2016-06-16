@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Diagnostics;
 using System.Media;
 using System.Windows;
@@ -45,13 +46,9 @@ namespace prxSearcher
                 case Key.Escape: 
                     if (pl != null)
                     {
-                        if (pl.mIsRunFinding)
+                        if (pl.mIsRunFinding || pl.mIsRunTesting)
                         {
                             pl.StopProxiesWorkers();
-                        }
-                        else if(pl.mIsRunTesting)
-                        {
-                            pl.StopProxiesWorkers();                            
                         }
                         else if (MessageBox.Show("Do you want exit?", "exit", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
                         {
@@ -78,8 +75,25 @@ namespace prxSearcher
                 case Key.F6:
                     menuTestPrxs_Click(this, null);
                     break;
-            }
+                case Key.F9:
+                    menuSaveResultToFile_Click(this, null);
+                    break;
+            }            
         }        
+
+        private void menuSaveResultToFile_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog fd = new SaveFileDialog();
+            fd.FileName = mySettings.mPathToFileResult;
+            fd.DefaultExt = ".txt";
+            fd.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+            fd.InitialDirectory = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            if (fd.ShowDialog() == true)
+            {
+                pl.SaveResultToFile(fd.FileName);
+                System.Diagnostics.Process.Start("explorer.exe", @"/select, " + fd.FileName);
+            }
+        }
 
         private void menuSettings_Click(object sender, RoutedEventArgs e)
         {
@@ -151,7 +165,7 @@ namespace prxSearcher
         {
             if (pl != null)
             {
-                pl.TestProxiesDictionary(mySettings.mThreadsCount, "http://whatismyipaddress.com/");
+                pl.TestProxiesDictionary(mySettings.mThreadsCount, "http://whatismyipaddress.com/", ".*?country:.*?<td.*?>(.*?)</td.*");
                 pbStatus.Visibility = Visibility.Collapsed;
             }
             else

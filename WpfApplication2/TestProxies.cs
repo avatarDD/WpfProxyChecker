@@ -11,6 +11,7 @@ namespace prxSearcher
         private Dictionary<string, Proxy> mPrxsDic;
         private Proxy[] mArray;
         private string mTarget;
+        private string mRegexCountry;
 
         public event EventHandler mTstDead;
         public event EventHandler mPrxsLstUpdated;
@@ -21,11 +22,12 @@ namespace prxSearcher
         /// <param name="PrxsDic">Dictionary of all proxies</param>
         /// <param name="Target">Site for testing proxies</param>
         /// <param name="xArray">part of proxies for testing in this thread</param>
-        public TestProxies(ref Dictionary<string, Proxy> PrxsDic, string Target, Proxy[] xArray)
+        public TestProxies(ref Dictionary<string, Proxy> PrxsDic, string Target, Proxy[] xArray, string RegexContry)
         {
             mPrxsDic = PrxsDic;
             mArray = xArray;
             mTarget = Target;
+            mRegexCountry = RegexContry;
 
             mT = new Thread(new ThreadStart(Test));
             mIsRun = true;
@@ -44,6 +46,14 @@ namespace prxSearcher
                 {
                     FillProperties(mArray[i], html, t, "http");
                 }
+                else if(Web_Client.GetViaSocks(true, mTarget,mArray[i].adress, out html, out t))
+                {
+                    FillProperties(mArray[i], html, t, "socks5");
+                }
+                else if (Web_Client.GetViaSocks(false, mTarget, mArray[i].adress, out html, out t))
+                {
+                    FillProperties(mArray[i], html, t, "socks4");
+                }
                 else
                 {
                     lock(mPrxsDic)
@@ -58,8 +68,8 @@ namespace prxSearcher
 
         private void FillProperties(Proxy prx, string html, double t, string proxyType)
         {
-            string country = GetCountry(html);
-            string type_p = (proxyType == String.Empty)?GetTypeOfProxy(html) : proxyType;
+            string country = GetCountry(html, mRegexCountry);
+            string type_p = proxyType;
             lock (mPrxsDic)
             {
                 mPrxsDic[prx.adress].latency = Math.Round(t, 0);
@@ -69,14 +79,9 @@ namespace prxSearcher
             }
         }
 
-        private string GetCountry(string html)
+        private string GetCountry(string html, string regex)
         {
-            return string.Empty;
-        }
-
-        private string GetTypeOfProxy(string html)
-        {
-            return string.Empty;
+            return html_parser.Replace(html, regex, "$1");
         }
 
         public void StopTesting()
