@@ -129,7 +129,8 @@ namespace prxSearcher
                                  mySettings.mNeedProxyCount,
                                  mySettings.mSearchers,
                                  proxyParam,
-                                 mySettings.mSearchPhrase);
+                                 mySettings.mSearchPhrase,
+                                 mySettings.mTimeOutFind);
             
             dtUnsrtd.ItemsSource = pl;
             pbStatus.Visibility = Visibility.Visible;
@@ -184,7 +185,9 @@ namespace prxSearcher
                     MessageBox.Show("Fill list of targets first", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
                 }
-                pl.TestProxiesDictionary(mySettings.mTestThreadsCount,mySettings.mTargets);
+                pl.TestProxiesDictionary(mySettings.mTestThreadsCount,
+                                         mySettings.mTargets,
+                                         mySettings.mTimeOutTest);
                 pbStatus.Visibility = Visibility.Collapsed;
             }
             else

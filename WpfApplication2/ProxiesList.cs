@@ -51,6 +51,8 @@ namespace prxSearcher
         public Dictionary<string, Proxy> mPrxsDic;
         private string mProxy;
         private string mSearchPhrase;
+        private int mTimeOutFind;
+        private int mTimeOutTest;
         /// <summary>
         /// For display on DataGrid
         /// </summary>
@@ -73,7 +75,7 @@ namespace prxSearcher
         /// <param name="SearchersList">list of searcher systems</param>
         /// <param name="Proxy">searching via proxy?</param>
         /// <param name="SearchPhrase">seach phrase</param>
-        public ProxiesList(int Threads, int Count, List<Searcher> SearchersList, string Proxy, string SearchPhrase)
+        public ProxiesList(int Threads, int Count, List<Searcher> SearchersList, string Proxy, string SearchPhrase, int TimeOut)
         {
             mPrxsDic = new Dictionary<string, Proxy>();
             mThreadsCountFind = Threads;
@@ -81,6 +83,7 @@ namespace prxSearcher
             mSearchers = SearchersList;
             mProxy = Proxy;
             mSearchPhrase = SearchPhrase;
+            mTimeOutFind = TimeOut;
             mPrxsArray = new Proxy[] { };
             mCurrentSearchPageOfSearcherDic = new Dictionary<Searcher, Dictionary<int, bool>>() { };
         }
@@ -96,7 +99,7 @@ namespace prxSearcher
             for (int i = 0; i < mThreadsCountFind; i++)
             {
                 int pageNum = GetNewPageNumber(mSearchers[srchrId]);
-                var prsr = new ProxySearcher(this, mSearchers[srchrId], mSearchPhrase, pageNum, ref mSearchers, ref mPrxsDic, mPrxsCountNeed, mProxy);
+                var prsr = new ProxySearcher(this, mSearchers[srchrId], mSearchPhrase, pageNum, ref mSearchers, ref mPrxsDic, mPrxsCountNeed, mProxy, mTimeOutFind);
                 prsr.mKilled += new EventHandler(UpdateProxyLoadThreadsList);
                 prsr.mPrxsLstUpdated += new EventHandler(OnChanged);
                 prsr.Start();
@@ -110,13 +113,14 @@ namespace prxSearcher
         /// <summary>
         /// Test proxies Dictionary
         /// </summary>
-        public void TestProxiesDictionary(int Threads, List<Target> TargetsList)
+        public void TestProxiesDictionary(int Threads, List<Target> TargetsList, int TimeOut)
         {
             while(mThreadsCountFind > 0)
             {
                 Thread.Sleep(100);
             }
             mTargets = TargetsList;
+            mTimeOutTest = TimeOut;
             mThreadsCountTest = Threads;
             mIsRunTesting = true;
 
@@ -140,7 +144,7 @@ namespace prxSearcher
                 Array.Copy(mPrxsArray, xStartFrom, partOfArray, 0, xLength);
                 xStartFrom += xLength;
 
-                var tpt = new TestProxies(ref mPrxsDic, mTargets[idTarget], partOfArray);
+                var tpt = new TestProxies(ref mPrxsDic, mTargets[idTarget], partOfArray, mTimeOutTest);
                 tpt.mTstDead += new EventHandler(TestProxiesThreadsListUpdate);
                 tpt.mPrxsLstUpdated += new EventHandler(OnChanged);
                 tpt.Start();

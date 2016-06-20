@@ -8,7 +8,7 @@ namespace prxSearcher
 {
     static class Web_Client
     {
-        public static bool Get(string Uri, string Proxy, out string Html, out double TimeSpan)
+        public static bool Get(string Uri, string Proxy, out string Html, out double TimeSpan, int TimeOut)
         {
             TimeSpan = 0;
 
@@ -33,7 +33,7 @@ namespace prxSearcher
                     request.Proxy = new WebProxy(Proxy);
                 }
 
-                request.Timeout = 8000;
+                request.Timeout = TimeOut;
 
                 DateTime start = DateTime.Now;
 
@@ -56,7 +56,7 @@ namespace prxSearcher
             }
         }
 
-        public static bool GetViaSocks(bool SocksVer5, string Uri, string Proxy, out string html, out double TimeSpan)
+        public static bool GetViaSocks(bool SocksVer5, string Uri, string Proxy, out string html, out double TimeSpan, int TimeOut)
         {            
             html = string.Empty;
             TimeSpan = 0;
@@ -72,6 +72,7 @@ namespace prxSearcher
             try
             {
                 Socket socket = Socks5Client.Connect(SocksVer5, _proxyUrl, int.Parse(_proxyPort), _host, int.Parse(_hostPort), null, null);
+                socket.SendTimeout = TimeOut;
                 string userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0";
                 byte[] request = Encoding.ASCII.GetBytes(String.Format("GET / HTTP/1.1\r\nHost: {0}\r\nUser-Agent: {1}\r\n\r\n", _host, userAgent));
                 socket.Send(request);
@@ -82,8 +83,8 @@ namespace prxSearcher
                 {
                     string response = Encoding.ASCII.GetString(buffer, 0, recv);
                     html += response;
-                    if (!socket.Poll(1000 * 8000, SelectMode.SelectRead))
-                        break;
+                    if (!socket.Poll(1000 * 1000, SelectMode.SelectRead))
+                        break;                    
                 }
                 socket.Close();
 

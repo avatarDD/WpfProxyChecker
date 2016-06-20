@@ -27,12 +27,7 @@
                 <TabItem Header="Proxies">
                     <Grid Background="#FFF3E9E9">
                         <DataGrid x:Name="dtUnsrtd" d:LayoutOverrides="Width" Margin="2" IsReadOnly="True" Foreground="Black" Style="{DynamicResource DataGridStyle}" HorizontalGridLinesBrush="Gray">
-                            <DataGrid.Columns>
-                                <!--<DataGridTextColumn x:Name="adress" Header="IP adress : port"  Binding="{Binding adress}"/>
-                                <DataGridTextColumn x:Name="type" Header="Type" Binding="{Binding type}"/>
-                                <DataGridTextColumn x:Name="country" Header="Country" Binding="{Binding country}"/>
-                                <DataGridTextColumn x:Name="latency" Header="Latency" Binding="{Binding latency}"/>-->
-                            </DataGrid.Columns>
+                            <DataGrid.Columns/>
                         </DataGrid>
                     </Grid>
                 </TabItem>

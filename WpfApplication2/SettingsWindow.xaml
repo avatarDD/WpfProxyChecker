@@ -27,6 +27,7 @@
                             <Label VerticalAlignment="Center">How many proxies do you need?</Label>
                             <CheckBox VerticalAlignment="Center" Margin="5,0,0,0" Name="checkBoxProxy" IsChecked="{Binding mUseProxy, Mode=TwoWay}">Search via http proxy?</CheckBox>
                             <Label VerticalAlignment="Center">Search phrase</Label>
+                            <Label VerticalAlignment="Center">Timeout, msec</Label>
                         </StackPanel>
 
                         <StackPanel Grid.Row="0" Grid.Column="1"  >
@@ -34,6 +35,7 @@
                             <TextBox x:Name="NeedProxyCount" Width="160" MaxLength="6"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,2,0,0" Text="{Binding mNeedProxyCount, Mode=TwoWay}" ToolTip="min count"/>
                             <TextBox x:Name="ProxyAdress"  Width="160" MaxLength="21" IsEnabled="{Binding ElementName=checkBoxProxy, Path=IsChecked}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,2,0,0" Text="{Binding mProxy, Mode=TwoWay}"/>
                             <TextBox x:Name="SearchPhrase"  Width="160" MaxLength="160" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,2,0,0" Text="{Binding mSearchPhrase, Mode=TwoWay}"/>
+                            <TextBox x:Name="TimeOutFind"  Width="160" MaxLength="5" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,2,0,0" Text="{Binding mTimeOutFind, Mode=TwoWay}"/>
                         </StackPanel>
                     </Grid>
 
@@ -89,6 +91,8 @@
                     <WrapPanel>
                         <Label VerticalAlignment="Center">Test threads count</Label>
                         <TextBox x:Name="tbTestThreadsCount"  Width="160" MaxLength="3" VerticalAlignment="Center" Margin="210,0,0,0" Text="{Binding mTestThreadsCount, Mode=TwoWay}"/>
+                        <Label VerticalAlignment="Center">Timeout, msec</Label>
+                        <TextBox x:Name="tbTimeOutTest"  Width="160" MaxLength="5" VerticalAlignment="Center" Margin="210,0,0,0" Text="{Binding mTimeOutTest, Mode=TwoWay}"/>
                     </WrapPanel>
                 </Grid>
                 <Grid Grid.Row="1" >
