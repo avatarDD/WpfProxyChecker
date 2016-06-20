@@ -7,7 +7,7 @@ using System.Text;
 namespace prxSearcher
 {
 
-    public class Socks5Client
+    public sealed class Socks5Client:IDisposable
     {
         private string _socksAddr;
         private int _socksPort;
@@ -161,6 +161,11 @@ namespace prxSearcher
         {
             Socks5Client client = new Socks5Client(socksVer5, socksAddress, socksPort, destAddress, destPort, username, password);
             return client.Connect();
+        }
+
+        public void Dispose()
+        {
+            _socket.Dispose();
         }
     }
 

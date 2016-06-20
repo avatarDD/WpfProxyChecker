@@ -20,6 +20,11 @@
         /// <summary>
         /// latency of proxy
         /// </summary>
-        public double latency { get; set; }        
+        public double latency { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("{0} [{1}]", adress, type);
+        }
     }
 }

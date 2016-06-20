@@ -8,7 +8,6 @@ namespace prxSearcher
     class ProxySearcher
     {
         private Thread mT;
-        public int mId;
         private bool mIsRun { get; set; }
         private Searcher mSearcher;
         private ProxiesList mSender;
@@ -16,31 +15,34 @@ namespace prxSearcher
         private string mProxy;
         private Dictionary<string, Proxy> mPrxsDic;
         private int mPrxsCountNeed;
-        public delegate void mKilledEventHandler(object sender, KilledEventArgs e);
-        public event mKilledEventHandler mKilled;
+
+        public event EventHandler mKilled;
         public event EventHandler mPrxsLstUpdated;
 
         //methods
-        public ProxySearcher(ProxiesList sender, int NameOfThread, Searcher sr, string SearchPhrase, int StartFromPage, ref List<Searcher> SearchersList, ref Dictionary<string, Proxy> PrxsDic, int PrxsCountNeed, string useProxy)
+        public ProxySearcher(ProxiesList sender, Searcher sr, string SearchPhrase, int StartFromPage, ref List<Searcher> SearchersList, ref Dictionary<string, Proxy> PrxsDic, int PrxsCountNeed, string useProxy)
         {
             mSearcher = sr;
             mSearchPhrase = SearchPhrase;
             mSender = sender;
             mPrxsDic = PrxsDic;
             mPrxsCountNeed = PrxsCountNeed;
-            mProxy = useProxy;
+            mProxy = useProxy;                         
 
             mT = new Thread(new ThreadStart(ProxyToAssemble));
-            mT.Name = NameOfThread.ToString();
-            mId = NameOfThread;
             mIsRun = true;
             mT.IsBackground = true;
-            mT.Priority = ThreadPriority.Lowest;
-            mT.Start();                      
+            mT.Priority = ThreadPriority.Lowest;                                  
         }
                 
+        public void Start()
+        {
+            mT.Start();
+        }
+
         public bool IsRun()
         {
+            //return mT.ThreadState == ThreadState.Stopped;
             return mIsRun;
         }
 
@@ -70,25 +72,26 @@ namespace prxSearcher
                     if (html.ToLower().Contains("captcha"))
                     {
                         StopLoading();
-                        return;
                     }
                     ParseProxies(html_parser.Matches(html, mSearcher.regexExpOfResults));
                 }
 
                 Thread.Sleep(200);
             }
-
-            StopLoadingFromThis();
+            mIsRun = false;
+            mKilled(this, EventArgs.Empty);
         }
 
         private void ParseProxies(string[] Urls)
         {
             foreach (string s in Urls)
             {
-                if (mPrxsDic.Count >= mPrxsCountNeed || !mIsRun)
-                    return;
+                if (!mIsRun)
+                    break;
+
                 string html = "";
                 double t;
+
                 if (Web_Client.Get(html_parser.ClearUrl(s), "", out html, out t))
                 {
                     string[] proxies = html_parser.Matches(html, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{2,5}");
@@ -96,8 +99,6 @@ namespace prxSearcher
                     {
                         foreach (string p in proxies)
                         {
-                            if (!mIsRun)
-                                return;
                             if (p != "")
                             {
                                 if (!mPrxsDic.ContainsKey(p))
@@ -124,27 +125,12 @@ namespace prxSearcher
                     mPrxsDic.Add(p.adress, p);
                     mPrxsLstUpdated(this, EventArgs.Empty);
                 }
-
-                mIsRun = (mPrxsDic.Count >= mPrxsCountNeed) ? false : true;
             }
         }
 
         public void StopLoading()
         {
-            int i = int.Parse(mT.Name);        
             mIsRun = false;
-            mT.Join();
-            mKilled(this, new KilledEventArgs(i));
-        }
-
-        /// <summary>
-        /// Without blocking of calling thread
-        /// </summary>
-        private void StopLoadingFromThis()
-        {
-            int i = int.Parse(mT.Name);
-            mIsRun = false;
-            mKilled(this, new KilledEventArgs(i));
         }
     }
 }

@@ -1,17 +1,20 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Media;
+using System.Threading;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace prxSearcher
 {
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window,IDisposable
     {
         ProxiesList pl;
         Settings mySettings;
@@ -22,7 +25,6 @@ namespace prxSearcher
             tbStatus.Text = "Idle";
             pbStatus.Visibility = Visibility.Collapsed;
             mySettings = new Settings();
-            mySettings.LoadSettings();
         }
 
         private void MenuAbout_Click(object sender, RoutedEventArgs e)
@@ -83,11 +85,15 @@ namespace prxSearcher
 
         private void menuSaveResultToFile_Click(object sender, RoutedEventArgs e)
         {
+            if (pl == null)
+                return;
+            if (!pl.mPrxsFound)
+                return;
             SaveFileDialog fd = new SaveFileDialog();
             fd.FileName = mySettings.mPathToFileResult;
             fd.DefaultExt = ".txt";
             fd.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
-            fd.InitialDirectory = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            fd.InitialDirectory = Directory.GetCurrentDirectory();
             if (fd.ShowDialog() == true)
             {
                 pl.SaveResultToFile(fd.FileName);
@@ -119,7 +125,7 @@ namespace prxSearcher
             }
             string proxyParam = (mySettings.mUseProxy) ? mySettings.mProxy : String.Empty;
 
-            pl = new ProxiesList(mySettings.mThreadsCount,
+            pl = new ProxiesList(mySettings.mFindThreadsCount,
                                  mySettings.mNeedProxyCount,
                                  mySettings.mSearchers,
                                  proxyParam,
@@ -142,10 +148,13 @@ namespace prxSearcher
         {
             try
             {
-                Dispatcher.Invoke(() =>
+                Dispatcher.BeginInvoke(DispatcherPriority.Normal, (ThreadStart)delegate()
                 {
                     CollectionViewSource.GetDefaultView(dtUnsrtd.ItemsSource).Refresh();
+                    menuTestPrxs.IsEnabled = pl.mPrxsFound;
+                    menuSavePrxs.IsEnabled = pl.mPrxsFound;
                     pbStatus.Value = pl.mProgressValue;
+
                     if (pbStatus.Value == 0 && !pl.mIsRunFinding && !pl.mIsRunTesting)
                     {
                         pbStatus.Visibility = Visibility.Collapsed;
@@ -165,13 +174,28 @@ namespace prxSearcher
         {
             if (pl != null)
             {
-                pl.TestProxiesDictionary(mySettings.mThreadsCount, "http://whatismyipaddress.com/", ".*?country:.*?<td.*?>(.*?)</td.*");
+                if (!pl.mPrxsFound)
+                {
+                    MessageBox.Show("Find the proxies first", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+                if(mySettings.mTargets.Count==0)
+                {
+                    MessageBox.Show("Fill list of targets first", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+                pl.TestProxiesDictionary(mySettings.mTestThreadsCount,mySettings.mTargets);
                 pbStatus.Visibility = Visibility.Collapsed;
             }
             else
             {
-                MessageBox.Show("First find the proxies.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Find the proxies first", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
             }
+        }
+
+        public void Dispose()
+        {
+            pl.Dispose();
         }
     }
 }

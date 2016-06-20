@@ -33,7 +33,7 @@ namespace prxSearcher
                     request.Proxy = new WebProxy(Proxy);
                 }
 
-                request.Timeout = 10000;
+                request.Timeout = 8000;
 
                 DateTime start = DateTime.Now;
 
@@ -82,7 +82,7 @@ namespace prxSearcher
                 {
                     string response = Encoding.ASCII.GetString(buffer, 0, recv);
                     html += response;
-                    if (!socket.Poll(1000 * 1000, SelectMode.SelectRead))
+                    if (!socket.Poll(1000 * 8000, SelectMode.SelectRead))
                         break;
                 }
                 socket.Close();

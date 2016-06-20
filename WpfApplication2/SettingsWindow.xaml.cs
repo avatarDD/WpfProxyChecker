@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using Microsoft.Win32;
+using System.IO;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -40,6 +42,19 @@ namespace prxSearcher
             url.Focus();
         }
 
+        private void btnAddTarget_Click(object sender, RoutedEventArgs e)
+        {
+            var s = DataContext as Settings;
+            var target = new Target();
+            target.mAdress = "";
+            target.mRegexContry = "";
+            listBoxTargets.ItemsSource = null;
+            s.mTargets.Add(target);
+            listBoxTargets.ItemsSource = s.mTargets;
+            listBoxTargets.SelectedIndex = listBoxTargets.Items.Count - 1;
+            tbTargetAdress.Focus();
+        }
+
         private void btnDel_Click(object sender, RoutedEventArgs e)
         {
             var s = DataContext as Settings;
@@ -54,6 +69,20 @@ namespace prxSearcher
             url.Focus();
         }
 
+        private void btnDelTarget_Click(object sender, RoutedEventArgs e)
+        {
+            var s = DataContext as Settings;
+            var selectedElmnt = listBoxTargets.SelectedItem as Target;
+
+            listBoxTargets.SelectedIndex = -1;
+            listBoxTargets.ItemsSource = null;
+            s.mTargets.Remove(selectedElmnt);
+
+            listBoxTargets.ItemsSource = s.mTargets;
+            listBoxTargets.SelectedIndex = listBoxTargets.Items.Count - 1;
+            tbTargetAdress.Focus();
+        }
+
         private void btnDef_Click(object sender, RoutedEventArgs e)
         {
             if(MessageBox.Show("Restore settings to defalut?","Question",MessageBoxButton.YesNo,MessageBoxImage.Question,MessageBoxResult.No)==MessageBoxResult.Yes)
@@ -61,8 +90,12 @@ namespace prxSearcher
                 var s = DataContext as Settings;
                 s.RestoreSettingsToDefaults();
                 s.LoadSettings();
+
                 listBox.ItemsSource = null;
                 listBox.ItemsSource = s.mSearchers;
+
+                listBoxTargets.ItemsSource = null;
+                listBoxTargets.ItemsSource = s.mTargets;
             }
         }
 
@@ -84,9 +117,32 @@ namespace prxSearcher
             }
         }
 
+        private void listBoxTargets_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var s = DataContext as Settings;
+            var lb = sender as ListBox;
+            if (lb.SelectedIndex > -1)
+            {
+                sP1.DataContext = s.mTargets[lb.SelectedIndex];
+            }
+        }
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Owner.Focus();
+        }
+
+        private void SelectResultFilePath_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog fd = new SaveFileDialog();
+            fd.FileName = PathToFileResult.Text;
+            fd.DefaultExt = ".txt";
+            fd.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+            fd.InitialDirectory = Directory.GetCurrentDirectory();
+            if (fd.ShowDialog() == true)
+            {
+                PathToFileResult.Text = fd.SafeFileName;
+            }
         }
     }
 }
