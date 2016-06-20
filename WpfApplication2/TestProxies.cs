@@ -11,6 +11,7 @@ namespace prxSearcher
         private Dictionary<string, Proxy> mPrxsDic;
         private Proxy[] mArray;
         private Target mTarget;
+        private int mTimeOut;
 
         public event EventHandler mTstDead;
         public event EventHandler mPrxsLstUpdated;
@@ -21,11 +22,12 @@ namespace prxSearcher
         /// <param name="PrxsDic">Dictionary of all proxies</param>
         /// <param name="Target">Site for testing proxies</param>
         /// <param name="xArray">part of proxies for testing in this thread</param>
-        public TestProxies(ref Dictionary<string, Proxy> PrxsDic, Target Trgt, Proxy[] xArray)
+        public TestProxies(ref Dictionary<string, Proxy> PrxsDic, Target Trgt, Proxy[] xArray, int TimeOut)
         {
             mPrxsDic = PrxsDic;
             mArray = xArray;
             mTarget = Trgt;
+            mTimeOut = TimeOut;
 
             mT = new Thread(new ThreadStart(Test));
             mIsRun = true;
@@ -39,15 +41,15 @@ namespace prxSearcher
             {
                 string html;
                 double t;                               
-                if(Web_Client.Get(mTarget.mAdress, mArray[i].adress, out html, out t))
+                if(Web_Client.Get(mTarget.mAdress, mArray[i].adress, out html, out t, mTimeOut))
                 {
                     FillProperties(mArray[i], html, t, "http");
                 }
-                else if(Web_Client.GetViaSocks(true, mTarget.mAdress,mArray[i].adress, out html, out t))
+                else if(Web_Client.GetViaSocks(true, mTarget.mAdress,mArray[i].adress, out html, out t, mTimeOut))
                 {
                     FillProperties(mArray[i], html, t, "socks5");
                 }
-                else if (Web_Client.GetViaSocks(false, mTarget.mAdress, mArray[i].adress, out html, out t))
+                else if (Web_Client.GetViaSocks(false, mTarget.mAdress, mArray[i].adress, out html, out t, mTimeOut))
                 {
                     FillProperties(mArray[i], html, t, "socks4");
                 }
@@ -77,6 +79,7 @@ namespace prxSearcher
         private void FillProperties(Proxy prx, string html, double t, string proxyType)
         {
             string country = GetCountry(html, mTarget.mRegexContry);
+
             string type_p = proxyType;
             lock (mPrxsDic)
             {

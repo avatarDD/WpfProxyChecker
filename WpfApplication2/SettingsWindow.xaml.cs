@@ -96,6 +96,16 @@ namespace prxSearcher
 
                 listBoxTargets.ItemsSource = null;
                 listBoxTargets.ItemsSource = s.mTargets;
+               
+                ThreadsCount.Text = s.mFindThreadsCount.ToString();
+                NeedProxyCount.Text = s.mNeedProxyCount.ToString();
+                ProxyAdress.Text = s.mProxy;
+                ProxyAdress.IsEnabled = s.mUseProxy;
+                SearchPhrase.Text = s.mSearchPhrase;
+                TimeOutFind.Text = s.mTimeOutFind.ToString();
+
+                tbTestThreadsCount.Text = s.mTestThreadsCount.ToString();
+                tbTimeOutTest.Text = s.mTimeOutTest.ToString();
             }
         }
 

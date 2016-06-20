@@ -13,6 +13,7 @@ namespace prxSearcher
         private ProxiesList mSender;
         private string mSearchPhrase;
         private string mProxy;
+        private int mTimeOut;
         private Dictionary<string, Proxy> mPrxsDic;
         private int mPrxsCountNeed;
 
@@ -20,14 +21,15 @@ namespace prxSearcher
         public event EventHandler mPrxsLstUpdated;
 
         //methods
-        public ProxySearcher(ProxiesList sender, Searcher sr, string SearchPhrase, int StartFromPage, ref List<Searcher> SearchersList, ref Dictionary<string, Proxy> PrxsDic, int PrxsCountNeed, string useProxy)
+        public ProxySearcher(ProxiesList sender, Searcher sr, string SearchPhrase, int StartFromPage, ref List<Searcher> SearchersList, ref Dictionary<string, Proxy> PrxsDic, int PrxsCountNeed, string useProxy, int TimeOut)
         {
             mSearcher = sr;
             mSearchPhrase = SearchPhrase;
             mSender = sender;
             mPrxsDic = PrxsDic;
             mPrxsCountNeed = PrxsCountNeed;
-            mProxy = useProxy;                         
+            mProxy = useProxy;
+            mTimeOut = TimeOut;
 
             mT = new Thread(new ThreadStart(ProxyToAssemble));
             mIsRun = true;
@@ -67,7 +69,7 @@ namespace prxSearcher
                 string html = "";
                 string uri = txtQuery.ToString() + mSender.GetNewPageNumber(mSearcher).ToString();
                 double t;
-                if (Web_Client.Get(uri, mProxy, out html, out t))
+                if (Web_Client.Get(uri, mProxy, out html, out t, mTimeOut))
                 {
                     if (html.ToLower().Contains("captcha"))
                     {
@@ -92,7 +94,7 @@ namespace prxSearcher
                 string html = "";
                 double t;
 
-                if (Web_Client.Get(html_parser.ClearUrl(s), "", out html, out t))
+                if (Web_Client.Get(html_parser.ClearUrl(s), "", out html, out t, mTimeOut))
                 {
                     string[] proxies = html_parser.Matches(html, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{2,5}");
                     if (proxies.Length > 0)

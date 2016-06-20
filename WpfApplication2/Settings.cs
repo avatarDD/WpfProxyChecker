@@ -11,7 +11,7 @@ namespace prxSearcher
     {
         //members
         [DataMember]
-        public int mNeedProxyCount { get; set; }
+        public int mNeedProxyCount { get; set; }        
         [DataMember]
         public int mFindThreadsCount { get; set; }
         [DataMember]
@@ -26,6 +26,10 @@ namespace prxSearcher
         public List<Searcher> mSearchers { get; set; }
         [DataMember]
         public List<Target> mTargets { get; set; }
+        [DataMember]
+        public int mTimeOutFind { get; set; }
+        [DataMember]
+        public int mTimeOutTest { get; set; }
         [DataMember]
         public string mPathToFileSettings { get; set; }
         [DataMember]
@@ -55,6 +59,8 @@ namespace prxSearcher
                     mPathToFileResult = newSettings.mPathToFileResult;
                     mSearchers = newSettings.mSearchers;
                     mTargets = newSettings.mTargets;
+                    mTimeOutFind = newSettings.mTimeOutFind;
+                    mTimeOutTest = newSettings.mTimeOutTest;
                 }
             }
             catch (Exception)
@@ -94,6 +100,8 @@ namespace prxSearcher
             mUseProxy = false;
             mProxy = "127.0.0.1:3128";
             mSearchPhrase = "socks proxy list";
+            mTimeOutFind = 4000;
+            mTimeOutTest = 4000;
             mPathToFileResult = "ProxiesList.txt";
             mPathToFileSettings = "Settings.json";
 
