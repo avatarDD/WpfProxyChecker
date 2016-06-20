@@ -9,13 +9,17 @@
     <Grid Margin="0,0,0,0" Background="#FFD3C6C6">
         <Menu x:Name="menu" Height="27" VerticalAlignment="Top" Margin="0,0,0,0" BorderThickness="1" Background="#FFF3E9E9" BorderBrush="{DynamicResource LightBorderBrush}" Foreground="{DynamicResource DefaultedBorderBrush}">
             <MenuItem Header="File">
-                <MenuItem x:Name="menuFindPrxs" Header="Find proxies" Click="menuFindPrxs_Click"/>
-                <MenuItem x:Name="menuTestPrxs" Header="Test proxies"/>
+                <MenuItem x:Name="menuFindPrxs" Header="Find proxies [F5]" Click="menuFindPrxs_Click"/>
+                <MenuItem x:Name="menuTestPrxs" Header="Test proxies [F6]" IsEnabled="{Binding mPrxsFound, TargetNullValue='false',FallbackValue='false'}" Click="menuTestPrxs_Click"/>
                 <Separator/>
-                <MenuItem x:Name="menuExit" Header="Exit" Click="menuExit_Click"/>
+                <MenuItem x:Name="menuSavePrxs" Header="Save Results to file [F9]" IsEnabled="{Binding mPrxsFound, TargetNullValue='false',FallbackValue='false'}" Click="menuSaveResultToFile_Click"/>
+                <Separator/>
+                <MenuItem x:Name="menuSettings" Header="Settings [F2]" Click="menuSettings_Click"/>
+                <Separator/>
+                <MenuItem x:Name="menuExit" Header="Exit [Esc]" Click="menuExit_Click"/>
             </MenuItem>
             <MenuItem Header="?">
-                <MenuItem x:Name="menuAbout" Header="About" Click="MenuAbout_Click"/>
+                <MenuItem x:Name="menuAbout" Header="About [F1]" Click="MenuAbout_Click"/>
             </MenuItem>
         </Menu>
         <Grid RenderTransformOrigin="2.14,2.08" Margin="0,27,0,34">
