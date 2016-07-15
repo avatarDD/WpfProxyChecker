@@ -73,6 +73,7 @@ namespace prxSearcher
             {
                 Socket socket = Socks5Client.Connect(SocksVer5, _proxyUrl, int.Parse(_proxyPort), _host, int.Parse(_hostPort), null, null);
                 socket.SendTimeout = TimeOut;
+                socket.ReceiveTimeout = TimeOut;
                 string userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0";
                 byte[] request = Encoding.ASCII.GetBytes(String.Format("GET / HTTP/1.1\r\nHost: {0}\r\nUser-Agent: {1}\r\n\r\n", _host, userAgent));
                 socket.Send(request);
