@@ -51,10 +51,7 @@ namespace prxSearcher
                         if (pl.mIsRunFinding || pl.mIsRunTesting)
                         {
                             pl.StopProxiesWorkers();
-<<<<<<< HEAD
                             Thread.CurrentThread.IsBackground = true;
-=======
->>>>>>> origin/feature
                         }
                         else if (MessageBox.Show("Do you want exit?", "exit", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
                         {
