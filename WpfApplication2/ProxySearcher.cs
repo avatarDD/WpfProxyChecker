@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
 using System.Text;
 using System.Threading;
 
@@ -10,37 +8,41 @@ namespace prxSearcher
     class ProxySearcher
     {
         private Thread mT;
-        public int mId;
         private bool mIsRun { get; set; }
         private Searcher mSearcher;
         private ProxiesList mSender;
         private string mSearchPhrase;
+        private string mProxy;
         private Dictionary<string, Proxy> mPrxsDic;
         private int mPrxsCountNeed;
-        public delegate void mKilledEventHandler(object sender, KilledEnentArgs e);
-        public event mKilledEventHandler mKilled;
+
+        public event EventHandler mKilled;
         public event EventHandler mPrxsLstUpdated;
 
         //methods
-        public ProxySearcher(ProxiesList sender, int NameOfThread, Searcher sr, string SearchPhrase, int StartFromPage, ref List<Searcher> SearchersList, ref Dictionary<string, Proxy> PrxsDic, int PrxsCountNeed)
+        public ProxySearcher(ProxiesList sender, Searcher sr, string SearchPhrase, int StartFromPage, ref List<Searcher> SearchersList, ref Dictionary<string, Proxy> PrxsDic, int PrxsCountNeed, string useProxy)
         {
             mSearcher = sr;
             mSearchPhrase = SearchPhrase;
             mSender = sender;
             mPrxsDic = PrxsDic;
             mPrxsCountNeed = PrxsCountNeed;
-            
+            mProxy = useProxy;                         
+
             mT = new Thread(new ThreadStart(ProxyToAssemble));
-            mT.Name = NameOfThread.ToString();
-            mId = NameOfThread;
             mIsRun = true;
             mT.IsBackground = true;
-            mT.Priority = ThreadPriority.Lowest;
-            mT.Start();                      
+            mT.Priority = ThreadPriority.Lowest;                                  
         }
                 
+        public void Start()
+        {
+            mT.Start();
+        }
+
         public bool IsRun()
         {
+            //return mT.ThreadState == ThreadState.Stopped;
             return mIsRun;
         }
 
@@ -64,88 +66,46 @@ namespace prxSearcher
             {
                 string html = "";
                 string uri = txtQuery.ToString() + mSender.GetNewPageNumber(mSearcher).ToString();
-                if (Get(uri, string.Empty, out html))
+                double t;
+                if (Web_Client.Get(uri, mProxy, out html, out t))
                 {
                     if (html.ToLower().Contains("captcha"))
+                    {
                         StopLoading();
+                    }
                     ParseProxies(html_parser.Matches(html, mSearcher.regexExpOfResults));
                 }
 
                 Thread.Sleep(200);
             }
-
             mIsRun = false;
-        }
-
-        /// <summary>
-        /// Запрос методом GET
-        /// </summary>
-        private static bool Get(string Uri,string Proxy, out string Html)
-        {
-            if (Uri == "")
-            {
-                Html = "";
-                return false;
-            }
-            Html = "";
-
-            try
-            {                
-                if (Uri.Length > 0 && !html_parser.Test(Uri,"^https?://.*"))
-                {
-                    Uri = "http://" + Uri;
-                }
-
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Uri);
-
-                if (Proxy != "")
-                {
-                    request.Proxy = new WebProxy(Proxy);
-                }
-                //---------
-                //request.Proxy = new WebProxy("127.0.0.1:3128");
-                //---------
-                request.Timeout = 8000;
-
-                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                {
-                    if (response.StatusCode != HttpStatusCode.OK)
-                        return false;
-
-                    StreamReader reader = new StreamReader(response.GetResponseStream());
-                    Html = reader.ReadToEnd();
-
-                    return true;
-                }
-            }
-            catch(Exception)
-            {                
-                return false;
-            }
+            mKilled(this, EventArgs.Empty);
         }
 
         private void ParseProxies(string[] Urls)
         {
             foreach (string s in Urls)
             {
-                if (mPrxsDic.Count >= mPrxsCountNeed || !mIsRun)
-                    return;
+                if (!mIsRun)
+                    break;
+
                 string html = "";
-                if (Get(html_parser.ClearUrl(s), "", out html))
+                double t;
+
+                if (Web_Client.Get(html_parser.ClearUrl(s), "", out html, out t))
                 {
                     string[] proxies = html_parser.Matches(html, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{2,5}");
                     if (proxies.Length > 0)
                     {
                         foreach (string p in proxies)
                         {
-                            if (!mIsRun)
-                                return;
                             if (p != "")
                             {
                                 if (!mPrxsDic.ContainsKey(p))
                                 {
                                     Proxy newProxy = new Proxy();
                                     newProxy.adress = p;
+                                    newProxy.latency = -1;
                                     Add(newProxy);
                                 }
                             }
@@ -157,7 +117,8 @@ namespace prxSearcher
 
         private void Add(object Value)
         {
-            lock (mPrxsDic)
+            object lck = new object();
+            lock (lck)
             {
                 Proxy p = (Proxy)Value;
                 if (!mPrxsDic.ContainsKey(p.adress))
@@ -165,18 +126,12 @@ namespace prxSearcher
                     mPrxsDic.Add(p.adress, p);
                     mPrxsLstUpdated(this, EventArgs.Empty);
                 }
-
-                mIsRun = (mPrxsDic.Count >= mPrxsCountNeed) ? false : true;
             }
         }
 
         public void StopLoading()
         {
-            int i = int.Parse(mT.Name);        
-            mIsRun = false;            
-            //mT.Join();
-            if(mT.ThreadState == ThreadState.Stopped)
-                mKilled(this, new KilledEnentArgs(i));
+            mIsRun = false;
         }
     }
 }

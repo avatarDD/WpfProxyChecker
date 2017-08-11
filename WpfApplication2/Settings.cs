@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
-using System.ComponentModel;
+using System.Runtime.Serialization.Json;
 
 namespace prxSearcher
 {
@@ -17,7 +13,9 @@ namespace prxSearcher
         [DataMember]
         public int mNeedProxyCount { get; set; }
         [DataMember]
-        public int mThreadsCount { get; set; }
+        public int mFindThreadsCount { get; set; }
+        [DataMember]
+        public int mTestThreadsCount { get; set; }
         [DataMember]
         public bool mUseProxy { get; set; }
         [DataMember]
@@ -27,6 +25,8 @@ namespace prxSearcher
         [DataMember]
         public List<Searcher> mSearchers { get; set; }
         [DataMember]
+        public List<Target> mTargets { get; set; }
+        [DataMember]
         public string mPathToFileSettings { get; set; }
         [DataMember]
         public string mPathToFileResult { get; set; }
@@ -34,7 +34,7 @@ namespace prxSearcher
         //methods
         public Settings()
         {
-            mPathToFileSettings = "Settings.json";            
+            LoadSettings();      
         }       
 
         public void LoadSettings()
@@ -42,24 +42,24 @@ namespace prxSearcher
             try
             {
                 DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(Settings));
-                using (FileStream fs = new FileStream(mPathToFileSettings, FileMode.Open))
+                using (FileStream fs = new FileStream(mPathToFileSettings="settings.json", FileMode.Open))
                 {
                     Settings newSettings = (Settings)jsonFormatter.ReadObject(fs);
                     mNeedProxyCount = newSettings.mNeedProxyCount;
-                    mThreadsCount = newSettings.mThreadsCount;
+                    mFindThreadsCount = newSettings.mFindThreadsCount;
+                    mTestThreadsCount = newSettings.mTestThreadsCount;
                     mUseProxy = newSettings.mUseProxy;
                     mProxy = newSettings.mProxy;
                     mSearchPhrase = newSettings.mSearchPhrase;
                     mPathToFileSettings = newSettings.mPathToFileSettings;
                     mPathToFileResult = newSettings.mPathToFileResult;
                     mSearchers = newSettings.mSearchers;
+                    mTargets = newSettings.mTargets;
                 }
             }
             catch (Exception)
             {
                 RestoreSettingsToDefaults();
-                SaveSettingsToFile();
-                LoadSettings();
                 //throw new Exception("Can't read settings from file and settings was restored to default");
             }
         }
@@ -88,12 +88,12 @@ namespace prxSearcher
 
         public void RestoreSettingsToDefaults()
         {
-            RemoveSettingsFile();
             mNeedProxyCount = 500;
-            mThreadsCount = 20;
+            mFindThreadsCount = 24;
+            mTestThreadsCount = 100;
             mUseProxy = false;
             mProxy = "127.0.0.1:3128";
-            mSearchPhrase = "proxy list";
+            mSearchPhrase = "socks proxy list";
             mPathToFileResult = "ProxiesList.txt";
             mPathToFileSettings = "Settings.json";
 
@@ -164,6 +164,16 @@ namespace prxSearcher
                 pageVar = "sf",
                 regexExpOfResults = "(?<=serp__link\" href=\").*?(?=\")"
             });
+
+            mTargets = new List<Target>(){};
+
+            mTargets.Add(new Target() { mAdress = "http://ifconfig.co/", mRegexContry = "(?<=country\":\\W\").*?(?=\")" });
+            mTargets.Add(new Target() { mAdress = "http://whatismyipaddress.com/", mRegexContry = "(?<=Country:</th><td style=\\\"font-size:14px;\\\">).*?(?=<)" });
+            mTargets.Add(new Target() { mAdress = "http://wtfismyip.com/", mRegexContry = "(?<=geographic location of your ip address:</h2></center><center><p>).*?(?=<)" });
+            mTargets.Add(new Target() { mAdress = "http://tell-my-ip.com/", mRegexContry = "(?<=png\\\"> ).*?(?=<)" });
+
+            SaveSettingsToFile();
+            LoadSettings();
         }
     }
 }

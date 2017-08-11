@@ -5,102 +5,135 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:prxSearcher"
         mc:Ignorable="d"
-        Title="SettingsWindow" MaxWidth="520" MaxHeight="450" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow" KeyDown="Window_KeyDown" Closing="Window_Closing">
-    <Grid  Background="#FFF3E9E9">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition />
-            <RowDefinition Height="40"/>
-        </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions >
-                <ColumnDefinition Width="315"/>
-                <ColumnDefinition Width="160"/>
-            </Grid.ColumnDefinitions>
+        Title="SettingsWindow" MaxWidth="520" MaxHeight="450" Width="520" Height="450" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow" KeyDown="Window_KeyDown" Closing="Window_Closing">
+    <TabControl>
+        <TabItem Header="Find" HorizontalAlignment="Left" Height="20" Margin="0" VerticalAlignment="Top" Width="57">
+            <Grid Background="#FFE5E5E5">
+                <Grid  Background="#FFF3E9E9">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition />
+                        <RowDefinition Height="40"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="315"/>
+                            <ColumnDefinition Width="160"/>
+                        </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Row="0" Grid.Column="0" >
-                <Label VerticalAlignment="Center">Search threads count</Label>
-                <Label VerticalAlignment="Center">How many proxies do you need?</Label>
-                <CheckBox VerticalAlignment="Center" Margin="5,0,0,0" Name="checkBoxProxy" IsChecked="{Binding mUseProxy, Mode=TwoWay}">Search via proxy?</CheckBox>
-                <Label VerticalAlignment="Center">Search phrase</Label>
-                <Label VerticalAlignment="Center">Path to file settings</Label>
-                <Label VerticalAlignment="Center">Path to file result</Label>
-            </StackPanel>
+                        <StackPanel Grid.Row="0" Grid.Column="0" >
+                            <Label VerticalAlignment="Center">Search threads count</Label>
+                            <Label VerticalAlignment="Center">How many proxies do you need?</Label>
+                            <CheckBox VerticalAlignment="Center" Margin="5,0,0,0" Name="checkBoxProxy" IsChecked="{Binding mUseProxy, Mode=TwoWay}">Search via http proxy?</CheckBox>
+                            <Label VerticalAlignment="Center">Search phrase</Label>
+                        </StackPanel>
 
-            <StackPanel Grid.Row="0" Grid.Column="1"  >
-                <TextBox x:Name="ThreadsCount" Width="160" MaxLength="3"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,2,0,0" Text="{Binding mThreadsCount, Mode=TwoWay}"/>
-                <TextBox x:Name="NeedProxyCount" Width="160" MaxLength="6"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,2,0,0" Text="{Binding mNeedProxyCount, Mode=TwoWay}"/>
-                <TextBox x:Name="ProxyAdress"  Width="160" MaxLength="21" IsEnabled="{Binding ElementName=checkBoxProxy, Path=IsChecked}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,2,0,0" Text="{Binding mProxy, Mode=TwoWay}"/>
-                <TextBox x:Name="SearchPhrase"  Width="160" MaxLength="160" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,2,0,0" Text="{Binding mSearchPhrase, Mode=TwoWay}"/>
-                <TextBox x:Name="PathToFileSettings"  Width="160" MaxLength="256" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,2,0,0" IsEnabled="False"  Text="{Binding mPathToFileSettings, Mode=TwoWay}"/>
-                <TextBox x:Name="PathToFileResult"  Width="160" MaxLength="256"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,2,0,0" IsEnabled="False"  Text="{Binding mPathToFileResult, Mode=TwoWay}"/>
-            </StackPanel>
-        </Grid>
+                        <StackPanel Grid.Row="0" Grid.Column="1"  >
+                            <TextBox x:Name="ThreadsCount" Width="160" MaxLength="3"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,2,0,0" Text="{Binding mFindThreadsCount, Mode=TwoWay}"/>
+                            <TextBox x:Name="NeedProxyCount" Width="160" MaxLength="6"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,2,0,0" Text="{Binding mNeedProxyCount, Mode=TwoWay}" ToolTip="min count"/>
+                            <TextBox x:Name="ProxyAdress"  Width="160" MaxLength="21" IsEnabled="{Binding ElementName=checkBoxProxy, Path=IsChecked}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,2,0,0" Text="{Binding mProxy, Mode=TwoWay}"/>
+                            <TextBox x:Name="SearchPhrase"  Width="160" MaxLength="160" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,2,0,0" Text="{Binding mSearchPhrase, Mode=TwoWay}"/>
+                        </StackPanel>
+                    </Grid>
 
-        <GridSplitter Grid.Row="1" Height="5"  HorizontalAlignment="Stretch" Background="#FF979292" BorderBrush="#FF131212"/>
+                    <GridSplitter Grid.Row="1" Height="5"  HorizontalAlignment="Stretch" Background="#FF979292" BorderBrush="#FF131212"/>
 
-        <Grid Grid.Row="2" >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="120"/>
-                <ColumnDefinition Width="200"/>
-            </Grid.ColumnDefinitions>
+                    <Grid Grid.Row="2" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
 
-            <ListBox Grid.Row="2" Grid.Column="0" x:Name="listBox" MaxWidth="200" HorizontalAlignment="Center" Margin="5,5,5,5" ItemsSource="{Binding mSearchers, Mode=OneWay}" SelectionChanged="listBox_SelectionChanged">
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListBoxItem}">
-                        <Setter Property="Margin" Value="5"/>
-                        <Setter Property="Padding" Value="5"/>
-                        <Setter Property="Background" Value="LightGray"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                    <Border x:Name="brd" Background="{TemplateBinding Background}" 
-                                          BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                                        <RadioButton Focusable="False" Margin="{TemplateBinding Padding}" Foreground="{TemplateBinding Foreground}"
-                                                          IsChecked="{Binding Path=IsSelected, RelativeSource={RelativeSource TemplatedParent},Mode=TwoWay}">
-                                            <ContentPresenter/>
-                                        </RadioButton>
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsSelected" Value="True">
-                                            <Setter Property="Background" Value="Gray"/>
-                                            <Setter Property="Foreground" Value="White"/>
-                                            <Setter Property="BorderThickness" Value="1"/>
-                                            <Setter Property="BorderBrush" Value="Black"/>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
+                        <ListBox Grid.Row="2" Grid.Column="0" x:Name="listBox" MaxWidth="200" HorizontalAlignment="Center" Margin="5,5,5,5" ItemsSource="{Binding mSearchers, Mode=OneWay}" SelectionChanged="listBox_SelectionChanged"/>
 
-            <StackPanel Grid.Row="2" Grid.Column="1"  HorizontalAlignment="Left">
-                <Label VerticalAlignment="Center">Adress</Label>
-                <Label VerticalAlignment="Center">Step</Label>
-                <Label VerticalAlignment="Center">First page number</Label>
-                <Label VerticalAlignment="Center">Splitter</Label>
-                <Label VerticalAlignment="Center">Search variable</Label>
-                <Label VerticalAlignment="Center">Page variable</Label>
-                <Label VerticalAlignment="Center">Regular expression</Label>
-            </StackPanel>
-                                   
-            <StackPanel Name="sP" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left" >
-                <TextBox x:Name="url" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding url, Mode=TwoWay}"/>
-                <TextBox x:Name="step" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding step, Mode=TwoWay}"/>
-                <TextBox x:Name="first" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding first, Mode=TwoWay}" />
-                <TextBox x:Name="spltr" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding spltr, Mode=TwoWay}"/>
-                <TextBox x:Name="srchVar" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding srchVar, Mode=TwoWay}"  />
-                <TextBox x:Name="pageVar" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding pageVar, Mode=TwoWay}"/>
-                <TextBox x:Name="regexExpOfResults" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding regexExpOfResults, Mode=TwoWay}"/>
-            </StackPanel>
-        </Grid>
-        <Button Name="btnDef"  Grid.Row="3"  Content="Default" Width="50" HorizontalAlignment="Left" Margin="5,5,5,5" Click="btnDef_Click"></Button>
-        <Button Name="btnAdd"  Grid.Row="3"  Content="Add" Width="50" HorizontalAlignment="Right" Margin="5,5,110,5" Click="btnAdd_Click"></Button>
-        <Button Name="btnDel"  Grid.Row="3"  Content="Del" Width="50" HorizontalAlignment="Right" Margin="5,5,57,5" Click="btnDel_Click"></Button>
-        <Button Name="btnSave"  Grid.Row="3"  Content="Save" Width="50" HorizontalAlignment="Right" Margin="5,5,5,5" Click="BtnSave_Click"></Button>
-    </Grid>
+                        <StackPanel Grid.Row="2" Grid.Column="1"  HorizontalAlignment="Left">
+                            <Label VerticalAlignment="Center">Adress</Label>
+                            <Label VerticalAlignment="Center">Step</Label>
+                            <Label VerticalAlignment="Center">First page number</Label>
+                            <Label VerticalAlignment="Center">Splitter</Label>
+                            <Label VerticalAlignment="Center">Search variable</Label>
+                            <Label VerticalAlignment="Center">Page variable</Label>
+                            <Label VerticalAlignment="Center">Regular expression</Label>
+                        </StackPanel>
+
+                        <StackPanel Name="sP" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left" >
+                            <TextBox x:Name="url" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding url, Mode=TwoWay}"/>
+                            <TextBox x:Name="step" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding step, Mode=TwoWay}"/>
+                            <TextBox x:Name="first" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding first, Mode=TwoWay}" />
+                            <TextBox x:Name="spltr" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding spltr, Mode=TwoWay}"/>
+                            <TextBox x:Name="srchVar" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding srchVar, Mode=TwoWay}"  />
+                            <TextBox x:Name="pageVar" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding pageVar, Mode=TwoWay}"/>
+                            <TextBox x:Name="regexExpOfResults" Width="160" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding regexExpOfResults, Mode=TwoWay}"/>
+                        </StackPanel>
+                    </Grid>
+                    <Button Name="btnDef"  Grid.Row="3"  Content="Default" Width="50" HorizontalAlignment="Left" Margin="5,5,5,5" Click="btnDef_Click"></Button>
+                    <Button Name="btnAdd"  Grid.Row="3"  Content="Add" Width="50" HorizontalAlignment="Right" Margin="5,5,110,5" Click="btnAdd_Click"></Button>
+                    <Button Name="btnDel"  Grid.Row="3"  Content="Del" Width="50" HorizontalAlignment="Right" Margin="5,5,57,5" Click="btnDel_Click"></Button>
+                    <Button Name="btnSave"  Grid.Row="3"  Content="Save" Width="50" HorizontalAlignment="Right" Margin="5,5,5,5" Click="BtnSave_Click"></Button>
+                </Grid>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Test" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="57">
+            <Grid Background="#FFE5E5E5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="50"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="520"/>
+                    </Grid.ColumnDefinitions>
+                    <WrapPanel>
+                        <Label VerticalAlignment="Center">Test threads count</Label>
+                        <TextBox x:Name="tbTestThreadsCount"  Width="160" MaxLength="3" VerticalAlignment="Center" Margin="210,0,0,0" Text="{Binding mTestThreadsCount, Mode=TwoWay}"/>
+                    </WrapPanel>
+                </Grid>
+                <Grid Grid.Row="1" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="315"/>
+                        <ColumnDefinition Width="160"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ListBox Grid.Row="1" Grid.Column="0" x:Name="listBoxTargets" MaxWidth="300" Height="auto" HorizontalAlignment="Center" Margin="5,5,5,5" ItemsSource="{Binding mTargets, Mode=OneWay}" SelectionChanged="listBoxTargets_SelectionChanged"/>
+                    <StackPanel Grid.Row="1" Grid.Column="1" Name="sP1">
+                        <WrapPanel Grid.Row="1" Grid.Column="1">
+                            <Label VerticalAlignment="Center">Adress</Label>
+                            <TextBox x:Name="tbTargetAdress"  Width="160" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding mAdress, Mode=TwoWay}"/>
+                        </WrapPanel>
+                        <WrapPanel Grid.Row="1" Grid.Column="1">
+                            <Label VerticalAlignment="Center">Regex for country</Label>
+                            <TextBox x:Name="tbTargetCountryRegex"  Width="160" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding mRegexContry, Mode=TwoWay}"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <WrapPanel Grid.Row="2" Grid.Column="0">
+                        <Button Name="btnDef1"  Grid.Row="3"  Content="Default" Width="50" HorizontalAlignment="Left" Margin="5,5,5,5" Click="btnDef_Click"></Button>
+                        <Button Name="btnAddTarget"  Grid.Row="3"  Content="Add" Width="50" HorizontalAlignment="Right" Margin="5,5,110,5" Click="btnAddTarget_Click"></Button>
+                        <Button Name="btnDelTarget"  Grid.Row="3"  Content="Del" Width="50" HorizontalAlignment="Right" Margin="5,5,57,5" Click="btnDelTarget_Click"></Button>
+                        <Button Name="btnSave1"  Grid.Row="3"  Content="Save" Width="50" HorizontalAlignment="Right" Margin="5,5,5,5" Click="BtnSave_Click"></Button>
+                    </WrapPanel>
+                </Grid>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Misc" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="57">
+            <Grid Background="#FFE5E5E5">
+                <StackPanel>
+                    <Label VerticalAlignment="Center">Path to file settings</Label>
+                    <TextBox x:Name="PathToFileSettings"  Width="256" MaxLength="256" IsEnabled="False" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{Binding mPathToFileSettings, Mode=TwoWay}"/>
+                        <Label VerticalAlignment="Center">Path to file result</Label>
+                    <WrapPanel>
+                        <TextBox x:Name="PathToFileResult"  Width="256" MaxLength="256" IsEnabled="False" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{Binding mPathToFileResult, Mode=TwoWay}"/>
+                        <Button x:Name="SelectResultFilePath" Content="Select Path" Width="auto" Height="auto" Click="SelectResultFilePath_Click"/>
+                    </WrapPanel>
+                </StackPanel>
+            </Grid>
+        </TabItem>
+    </TabControl>
 </Window>
