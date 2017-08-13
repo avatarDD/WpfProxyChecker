@@ -169,8 +169,7 @@ namespace prxSearcher
             }
             Dictionary<int, bool> dicOfPages = mCurrentSearchPageOfSearcherDic[searcher];
 
-            object lck = new object();
-            lock (lck)
+            lock (mCurrentSearchPageOfSearcherDic)
             {
                 for (;;)
                 {

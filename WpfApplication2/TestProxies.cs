@@ -53,8 +53,7 @@ namespace prxSearcher
                 }
                 else
                 {
-                    object lck = new object();
-                    lock(lck)
+                    lock(mPrxsDic)
                     {
                         mPrxsDic.Remove(mArray[i].adress);
                         mPrxsLstUpdated(this, EventArgs.Empty);
@@ -79,8 +78,7 @@ namespace prxSearcher
         {
             string country = GetCountry(html, mTarget.mRegexContry);
             string type_p = proxyType;
-            object lck = new object();
-            lock (lck)
+            lock (mPrxsDic)
             {
                 mPrxsDic[prx.adress].latency = Math.Round(t, 0);
                 mPrxsDic[prx.adress].country = country;

@@ -117,8 +117,7 @@ namespace prxSearcher
 
         private void Add(object Value)
         {
-            object lck = new object();
-            lock (lck)
+            lock (mPrxsDic)
             {
                 Proxy p = (Proxy)Value;
                 if (!mPrxsDic.ContainsKey(p.adress))
