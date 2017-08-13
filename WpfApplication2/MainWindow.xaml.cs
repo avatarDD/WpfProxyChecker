@@ -195,6 +195,7 @@ namespace prxSearcher
 
         public void Dispose()
         {
+            Thread.CurrentThread.IsBackground = true;
             pl.Dispose();
         }
     }
